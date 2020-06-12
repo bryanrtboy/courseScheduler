@@ -1,0 +1,71 @@
+.planner-app,
+.modal {
+  font-family: "Open Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.show-detail-true,
+.show-loading-true {
+  visibility: hidden;
+}
+.show-detail-false,
+.show-loading-true,
+.planner-app-top {
+  margin: 4px auto;
+  visibility: visibile;
+}
+div.view-title h1 {
+  text-align: center;
+}
+.semester-navigation button {
+  height: 55px;
+  font-size: 20px;
+}
+
+.instructors a.room-conflict,
+.buildings a.room-conflict {
+  border-color: red !important;
+  border-width: 4px;
+}
+
+.instructors tr.room-conflict td,
+.buildings tr.room-conflict td {
+  border-color: red !important;
+  border-width: 4px;
+}
+#showAll {
+  width: 100px;
+  padding: 1px;
+  border-top-left-radius: 3.5px;
+  border-bottom-left-radius: 3.5px;
+}
+
+.fc-event-main {
+  font-family: "Roboto", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.all-day-true,
+.instructors .all-day-false {
+  visibility: hidden;
+  display: none;
+}
+.this,
+button.this,
+.instructors button.instructors,
+.courses button.courses,
+.buildings button.buildings,
+.courselistings button.courselistings,
+.calendar button.calendar {
+  background-color: rgb(26, 37, 47);
+  border-bottom-color: rgb(21, 30, 39);
+}
+
+/* .previous,
+.next {
+  font-size: 22px;
+  line-height: 14px;
+  width: 55px;
+} */

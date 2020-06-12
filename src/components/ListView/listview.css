@@ -1,0 +1,95 @@
+.courselisting li {
+  list-style: none;
+  padding-left: 0;
+}
+.n-scheduled-print {
+  color: #ddd;
+}
+
+.courselisting th:first-child {
+  width: 100%;
+  text-align: left;
+  padding: 0em 0.5em 0.75em 0.5em;
+  vertical-align: top;
+}
+.courselisting td {
+  vertical-align: top;
+  padding: 0.5em;
+  border: 1px #ddd solid;
+  border-collapse: collapse;
+}
+.courselisting table {
+  width: 100%;
+  border: 1px #ddd solid;
+  border-collapse: collapse;
+  empty-cells: show;
+  margin-bottom: 2em;
+}
+
+.courselisting p {
+  font-weight: normal;
+  max-width: 1000px;
+}
+.courselisting span {
+  font-weight: 100;
+  font-size: 75%;
+  color: #666;
+}
+.courselisting .courses ul {
+  padding-left: 0;
+}
+
+.courselisting .course-title {
+  width: 100%;
+}
+.courselisting p {
+  margin: 0;
+}
+
+@media print {
+  .planner-app-top {
+    display: none;
+    visibility: hidden;
+  }
+  h2 {
+    margin: 2.5em 0 1em 0;
+  }
+  /* .course-listings .course-title {
+    padding: 0 0 1em 0;
+  } */
+  p {
+    padding: 0 0 1em 0;
+    margin: 0;
+  }
+
+  .courselisting p {
+    padding: 0;
+    margin: 0;
+  }
+  .courselisting table {
+    page-break-inside: avoid;
+  }
+  .courselisting tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}
+
+td.time {
+  width: 10%;
+}
+td.meeting-pattern {
+  width: 2%;
+}
+
+td.main {
+  width: 88%;
+}
+
+td.main strong:hover {
+  background-color: #ddd;
+}
+
+td.main strong {
+  cursor: pointer;
+}
