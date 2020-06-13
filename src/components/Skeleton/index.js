@@ -14,6 +14,8 @@ class Skeleton extends React.Component {
           <tbody>
             <tr>
               <td>Requesting data...</td>
+            </tr>
+            <tr>
               <td>
                 <div className="loader"></div>
               </td>

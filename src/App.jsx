@@ -242,6 +242,7 @@ export default class App extends React.Component {
     if (this.state.view === "calendar") {
       let calendarApi = this.fullCalendarRef.current.getApi();
       calendarApi.gotoDate(goToDate);
+      this.forceCalendarRefresh();
     }
     this.setState({
       currentSemesterPosition: pPos,
@@ -366,7 +367,7 @@ export default class App extends React.Component {
     //https://cors-anywhere.herokuapp.com/
 
     let fetchPhp =
-      "https://www.bryanleister.com/fetching.php?term=" +
+      "https://bryanleister.com/fetching.php?term=" +
       semesterCodes[this.state.currentSemesterPosition].key +
       "&campus=DC";
 
