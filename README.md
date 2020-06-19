@@ -1,7 +1,3 @@
-![png](./calendar.png)
-
-![png](./listview.png)
-
 # Resource Viewer and Calendar
 
 This project was created to display course schedules in calendar and list views for the College of Arts & Media at the University of Colorado Denver. The courses are fetched from an API based on the selected semester. Results can be filtered by subject area in the Calendar and List View. Additional filtering by rooms, instructors or course ID's is possible in the List view.
@@ -11,7 +7,14 @@ The entire project is based on the [React](https://reactjs.org/) library. The Ca
 ### Future development
 A future goal for this project would be to create [React-native](https://reactnative.dev/) applications focusing on a limited subset of the broad functionality found in this project.
 
-## React Details
+## calendar view
+
+![png](./calendar.png)
+
+## list view (showing courses)
+
+![png](./listview.png)
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
