@@ -157,7 +157,8 @@ export default class App extends React.Component {
                 name=" < "
               />
               <Button
-                className="this fc-thisSemester-button fc-button fc-button-primary"
+                id="current-semester-button"
+                className="this fc-thisSemester-button current-semester-button fc-button fc-button-primary"
                 onClick={
                   this.state.currentlyFetchedSemesterPos !==
                   this.state.currentSemesterPosition

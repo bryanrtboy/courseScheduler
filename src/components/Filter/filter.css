@@ -3,6 +3,14 @@
   padding: 0;
 }
 
+.list-filter input {
+  background: rgb(44, 62, 80);
+  color: #fff;
+  height: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 .list-filter label {
   font-size: 14px;
   margin-left: 10px;

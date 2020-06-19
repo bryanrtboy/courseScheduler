@@ -4,7 +4,6 @@
   "private": true,
   "author": "Bryan Leister",
   "homepage": "https://designucd.com/cam",
-  "type": "module",
   "dependencies": {
     "@fullcalendar/core": "5.0.0-rc",
     "@fullcalendar/daygrid": "5.0.0-rc",

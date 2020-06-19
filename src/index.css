@@ -52,14 +52,18 @@ div.view-title h1 {
   visibility: hidden;
   display: none;
 }
-.this,
-button.this,
+
 .instructors button.instructors,
 .courses button.courses,
 .buildings button.buildings,
 .courselistings button.courselistings,
 .calendar button.calendar {
   background-color: rgb(26, 37, 47);
+  border-bottom-color: rgb(21, 30, 39);
+}
+
+button.this {
+  background-color: rgb(26, 37, 47) !important;
   border-bottom-color: rgb(21, 30, 39);
 }
 
