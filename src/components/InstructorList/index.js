@@ -1,13 +1,44 @@
 import React from "react";
 import _ from "lodash";
-import { formatAMPM} from "../FormattingUtilities.js";
+import Filter from "../Filter/";
+import { formatAMPM } from "../FormattingUtilities.js";
 import "./instructorlist.css";
 
 class InstructorList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { value: "", grouped: [], events: [] };
     this.handleChange = this.handleChange.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
+
+  componentDidMount() {
+    this.updateAllEvents();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.events !== this.props.events ||
+      prevState.value !== this.state.value
+    ) {
+      this.updateAllEvents();
+    }
+  }
+
+  updateAllEvents() {
+    let grouped = this.getAllEvents();
+
+    this.setState({
+      grouped: grouped,
+      events: this.props.events
+    });
+  }
+
+  handleFilterChange = event => {
+    this.setState({
+      value: event.target.value
+    });
+  };
 
   handleChange = event => e => {
     if (typeof this.props.onClick === "function") this.props.onClick(event);
@@ -56,12 +87,24 @@ class InstructorList extends React.Component {
         let displayName = r[0].extendedProps.instructor_name;
         let count = " (" + r.length + ")";
         //console.log(r);
-        grouped.push({
-          id: courseKeys[i],
-          displayName: displayName,
-          count: count,
-          rooms: r
-        });
+
+        let include = true;
+        if (
+          this.state.value.length > 0 &&
+          !r[0].extendedProps.last_name
+            .toLowerCase()
+            .includes(this.state.value.toLowerCase())
+        ) {
+          include = false;
+        }
+        if (include) {
+          grouped.push({
+            id: courseKeys[i],
+            displayName: displayName,
+            count: count,
+            rooms: r
+          });
+        }
       }
     }
 
@@ -71,57 +114,64 @@ class InstructorList extends React.Component {
 
   render() {
     return (
-      <div className="courselisting instructors">
-        {this.getAllEvents().map(resource => (
-          <table key={resource.id}>
-            <tbody>
-              <tr>
-                <th colSpan="3">
-                  <h2>
-                    {resource.displayName}
-                    <span>{resource.count}</span>
-                  </h2>
-                </th>
-              </tr>
-              {resource.rooms.map(event => (
-                <tr
-                  key={event.extendedProps.key}
-                  className={
-                    event.extendedProps.schedule_print.toLowerCase() +
-                    "-scheduled-print " +
-                    " " +
-                    (event.extendedProps.room_conflict === true
-                      ? "room-conflict"
-                      : " ")
-                  }
-                >
-                  <td className="meeting-pattern">
-                    <strong>
-                      {event.extendedProps.standard_meeting_pattern}
-                    </strong>
-                  </td>
-                  <td className="time">
-                    {formatAMPM(event.startTime) +
-                      "-" +
-                      formatAMPM(event.endTime)}{" "}
-                  </td>
-                  <td className="main">
-                    <strong onClick={this.handleChange(event)}>
-                      {event.extendedProps.subject_code + " " + event.title}
-                    </strong>
-                    <p>
-                      {event.extendedProps.last_name +
-                        " " +
-                        event.extendedProps.enrollment_total +
-                        "/" +
-                        event.extendedProps.enrollment_cap}
-                    </p>
-                  </td>
+      <div>
+        <Filter
+          label="Last Name Filter"
+          value={this.value}
+          onChange={this.handleFilterChange}
+        />
+        <div className="courselisting instructors">
+          {this.state.grouped.map(resource => (
+            <table key={resource.id}>
+              <tbody>
+                <tr>
+                  <th colSpan="3">
+                    <h2>
+                      {resource.displayName}
+                      <span>{resource.count}</span>
+                    </h2>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
+                {resource.rooms.map(event => (
+                  <tr
+                    key={event.extendedProps.key}
+                    className={
+                      event.extendedProps.schedule_print.toLowerCase() +
+                      "-scheduled-print " +
+                      " " +
+                      (event.extendedProps.room_conflict === true
+                        ? "room-conflict"
+                        : " ")
+                    }
+                  >
+                    <td className="meeting-pattern">
+                      <strong>
+                        {event.extendedProps.standard_meeting_pattern}
+                      </strong>
+                    </td>
+                    <td className="time">
+                      {formatAMPM(event.startTime) +
+                        "-" +
+                        formatAMPM(event.endTime)}{" "}
+                    </td>
+                    <td className="main">
+                      <strong onClick={this.handleChange(event)}>
+                        {event.extendedProps.subject_code + " " + event.title}
+                      </strong>
+                      <p>
+                        {event.extendedProps.last_name +
+                          " " +
+                          event.extendedProps.enrollment_total +
+                          "/" +
+                          event.extendedProps.enrollment_cap}
+                      </p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ))}
+        </div>
       </div>
     );
   }

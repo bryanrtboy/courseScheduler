@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import momentTimezonePlugin from "@fullcalendar/moment-timezone";
+//import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 
 import { colorBySubject } from "../FormattingUtilities.js";
 
@@ -77,7 +77,7 @@ class Calendar extends React.Component {
             }
           }}
           headerToolbar={{
-            left: "goPrev,goToday,goNext",
+            left: "goPrev,goNext goToday",
             right:
               "resourceTimelineMonth,resourceTimelineWeek,resourceTimelineThreeDays,resourceTimelineDay"
           }}
@@ -97,8 +97,7 @@ class Calendar extends React.Component {
             dayGridPlugin,
             timeGridPlugin,
             interactionPlugin,
-            resourceTimelinePlugin,
-            momentTimezonePlugin
+            resourceTimelinePlugin
           ]}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
           editable={false}

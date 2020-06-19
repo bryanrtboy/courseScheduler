@@ -3,7 +3,7 @@ import "./index.css";
 
 import Calendar from "./components/Calendar/";
 import Button from "./components/Button/";
-import FormStackButton from "./components/FormStackButton/";
+import FormStack from "./components/FormStack/";
 import Modal from "./components/Modal/";
 import CourseDetail from "./components/CourseDetail/";
 import ListView from "./components/ListView/";
@@ -52,10 +52,7 @@ export default class App extends React.Component {
       >
         <div className="modal">
           <div className="modal-main">
-            <FormStackButton
-              isVisible={false}
-              currentEvent={this.state.modalEvent}
-            />{" "}
+            <FormStack isVisible={false} currentEvent={this.state.modalEvent} />{" "}
             <CourseDetail
               currentEvent={this.state.modalEvent}
               latestUpdateVisible={this.state.latestUpdatedEvent}
@@ -84,7 +81,11 @@ export default class App extends React.Component {
         <ListView
           events={this.state.events}
           resourceType={this.state.resourceType}
-          semester={semesterCodes[this.state.currentlyFetchedSemesterPos].value}
+          semester={
+            this.state.currentlyFetchedSemesterPos !== 0
+              ? semesterCodes[this.state.currentlyFetchedSemesterPos].value
+              : "No Semester Data has been Fetched!"
+          }
           onClick={this.handleShow}
         />
       ) : null;
@@ -120,16 +121,16 @@ export default class App extends React.Component {
           }
         >
           <div className="fc fc-media-screen fc-direction-ltr fc-theme-standard fc-liquid-hack">
-            <div className="fc-button-group">
+            <div className="fc-button-group calendar-list">
               <Button
                 className="calendar fc-previousSemester-button fc-button fc-button-primary"
                 onClick={this.handleViewChange}
-                name="calendar"
+                name="CALENDAR"
               />
               <Button
                 className="courselistings fc-thisSemester-button fc-button fc-button-primary"
                 onClick={this.handleViewChange}
-                name="list view"
+                name="LIST VIEW"
               />
             </div>{" "}
             <div className="fc-button-group">
@@ -367,7 +368,7 @@ export default class App extends React.Component {
     //https://cors-anywhere.herokuapp.com/
 
     let fetchPhp =
-      "https://bryanleister.com/fetching.php?term=" +
+      "https://designucd.com/fetching.php?term=" +
       semesterCodes[this.state.currentSemesterPosition].key +
       "&campus=DC";
 

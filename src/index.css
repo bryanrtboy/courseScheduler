@@ -63,9 +63,7 @@ button.this,
   border-bottom-color: rgb(21, 30, 39);
 }
 
-/* .previous,
-.next {
-  font-size: 22px;
-  line-height: 14px;
-  width: 55px;
-} */
+.calendar-list {
+  text-transform: uppercase;
+  height: 50px;
+}

@@ -1,14 +1,45 @@
 import React from "react";
 import _ from "lodash";
 import { formatAMPM } from "../FormattingUtilities.js";
+import Filter from "../Filter/";
 import courseDescriptions from "../../data/camuniqueinventory.json";
 import "./courselist.css";
 
 class CourseList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { value: "", grouped: [], events: [] };
     this.handleChange = this.handleChange.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
+
+  componentDidMount() {
+    this.updateAllEvents();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.events !== this.props.events ||
+      prevState.value !== this.state.value
+    ) {
+      this.updateAllEvents();
+    }
+  }
+
+  updateAllEvents() {
+    let grouped = this.getAllEvents();
+
+    this.setState({
+      grouped: grouped,
+      events: this.props.events
+    });
+  }
+
+  handleFilterChange = event => {
+    this.setState({
+      value: event.target.value
+    });
+  };
 
   handleChange = event => e => {
     if (typeof this.props.onClick === "function") this.props.onClick(event);
@@ -67,69 +98,87 @@ class CourseList extends React.Component {
           r[0].extendedProps.course_title;
         let count = " (" + r.length + ")";
         //console.log(r);
-        grouped.push({
-          id: courseKeys[i],
-          displayName: displayName,
-          count: count,
-          description: description,
-          rooms: r
-        });
+        let include = true;
+        if (
+          this.state.value.length > 0 &&
+          !r[0].extendedProps.catalog_number.includes(this.state.value)
+        ) {
+          include = false;
+        }
+
+        if (include) {
+          grouped.push({
+            id: courseKeys[i],
+            displayName: displayName,
+            count: count,
+            description: description,
+            rooms: r
+          });
+        }
       }
     }
-
     //console.log(grouped);
     return grouped;
   }
 
   render() {
     return (
-      <div className="courselisting">
-        {this.getAllEvents().map((resource, index) => (
-          <table key={index}>
-            <tbody>
-              <tr>
-                <th colSpan="3">
-                  <h2>
-                    {resource.displayName}
-                    <span>{resource.count}</span>
-                  </h2>
-                  <p>{resource.description}</p>
-                </th>
-              </tr>
-              {resource.rooms.map(event => (
-                <tr
-                  key={event.extendedProps.key}
-                  className={
-                    event.extendedProps.schedule_print.toLowerCase() +
-                    "-scheduled-print"
-                  }
-                >
-                  <td className="meeting-pattern">
-                    <strong>
-                      {event.extendedProps.standard_meeting_pattern}
-                    </strong>
-                  </td>
-                  <td className="time">
-                    {formatAMPM(event.startTime) +
-                      "-" +
-                      formatAMPM(event.endTime)}{" "}
-                  </td>
-                  <td className="main">
-                    <strong onClick={this.handleChange(event)}>
-                      {event.extendedProps.subject_code + " " + event.title}
-                    </strong>
-                    <p>
-                      {event.extendedProps.last_name}{" "}
-                      {event.extendedProps.instructor_role_code === "PI"
-                        ? " "
-                        : " (" + event.extendedProps.instructor_role_code + ")"}
-                    </p>
-                  </td>
+      <div>
+        <Filter
+          label="Course Number Filter"
+          value={this.value}
+          onChange={this.handleFilterChange}
+        />
+        <div className="courselisting">
+          {this.state.grouped.map((resource, index) => (
+            <table key={index}>
+              <tbody>
+                <tr>
+                  <th colSpan="3">
+                    <h2>
+                      {resource.displayName}
+                      <span>{resource.count}</span>
+                    </h2>
+                    <p>{resource.description}</p>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
+                {resource.rooms.map(event => (
+                  <tr
+                    key={event.extendedProps.key}
+                    className={
+                      event.extendedProps.schedule_print.toLowerCase() +
+                      "-scheduled-print"
+                    }
+                  >
+                    <td className="meeting-pattern">
+                      <strong>
+                        {event.extendedProps.standard_meeting_pattern}
+                      </strong>
+                    </td>
+                    <td className="time">
+                      {formatAMPM(event.startTime) +
+                        "-" +
+                        formatAMPM(event.endTime)}{" "}
+                    </td>
+                    <td className="main">
+                      <strong onClick={this.handleChange(event)}>
+                        {event.extendedProps.subject_code + " " + event.title}
+                      </strong>
+                      <p>
+                        {event.extendedProps.last_name}{" "}
+                        {event.extendedProps.instructor_role_code === "PI"
+                          ? " "
+                          : " (" +
+                            event.extendedProps.instructor_role_code +
+                            ")"}
+                      </p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ))}
+        </div>
       </div>
     );
   }

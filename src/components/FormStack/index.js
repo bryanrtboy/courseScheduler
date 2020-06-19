@@ -1,33 +1,39 @@
 import React from "react";
 import CustomSelect from "../CustomSelect/";
+import ToggleSwitch from "../Toggle/";
 import { formatAMPM } from "../FormattingUtilities.js";
 import approvers from "../../data/approvers.json";
 import requestors from "../../data/requestors.json";
 
-import "./formstackbutton.css";
+import "./formstack.css";
 
 class FSButton extends React.Component {
   constructor(props) {
     super(props);
-    this.getUrl = this.getUrl.bind(this);
+    this.courseChangeURL = this.courseChangeURL.bind(this);
+    this.addCourseURL = this.addCourseURL.bind(this);
     this.changeApprover = this.changeApprover.bind(this);
     this.validateAndSubmit = this.validateAndSubmit.bind(this);
     this.changeFrom = this.changeFrom.bind(this);
+    this.onCheckboxChange = this.onCheckboxChange.bind(this);
     this.state = {
       approver: { name: "", email: "" },
       from: { name: "", email: "" },
+      add: false,
+      isFutureCourse: true,
       isValid: false
     };
   }
 
   componentDidMount() {
-    //console.log(this);
-    // let status = "OK";
-    // if (new Date() > this.props.currentEvent.start) {
-    //   status = "Not OK to show Form button";
-    // }
-    // console.log(status);
-    //console.log(formatDate(this.props.currentEvent.start, timeFormat));
+    let isFutureCourse =
+      new Date() <
+      new Date(this.props.currentEvent.extendedProps.class_start_date);
+
+    this.setState({
+      isFutureCourse: isFutureCourse,
+      add: !isFutureCourse
+    });
   }
 
   componentWillUnmount() {}
@@ -42,7 +48,64 @@ class FSButton extends React.Component {
     }
   };
 
-  getUrl() {
+  addCourseURL() {
+    let url = "https://ucdenverdata.formstack.com/forms/new_course_add_form?";
+    const e = this.props.currentEvent;
+
+    let start = formatAMPM(e.extendedProps.meeting_time_start);
+    let end = formatAMPM(e.extendedProps.meeting_time_end);
+    start = start.split(":");
+    end = end.split(":");
+
+    url += "field82722827=" + e.extendedProps.term_code;
+    url += "&field82722824=" + e.extendedProps.catalog_number;
+    url += "&field82722823=" + e.extendedProps.subject_code;
+    url += "&field82722825=TBD";
+    url += "&field82661887=TBD";
+    url += "&field82661997=TBD";
+    url += "&field82722829=" + e.extendedProps.course_title;
+    url += "&field82722838=" + e.extendedProps.instructor_name;
+    url += "&field82722837=" + e.extendedProps.instructor_email;
+    url += "&field82722826=" + e.extendedProps.enrollment_cap; //For display only
+    url += "&field84502599=" + e.extendedProps.enrollment_total;
+    url += "&field82722840=" + e.extendedProps.instructor_role_code;
+    url += "&field82722858=" + e.extendedProps.instructor_mode_code;
+    url += "&field82722841=" + e.extendedProps.instructor_load_factor;
+    url += "&field82722842=" + e.extendedProps.grade_restriction_access;
+    url += "&field82722843=" + e.extendedProps.instructor_assignment_number;
+    url += "&field82722845=" + e.extendedProps.building_id;
+    url += "&field82722846=" + e.extendedProps.room_number;
+    url += "&field82722847=" + e.extendedProps.standard_meeting_pattern;
+    url += "&field82722851=" + e.extendedProps.enrollment_cap;
+    url += "&field82722852=" + e.extendedProps.room_cap_request;
+    url += "&field82722853=" + e.extendedProps.wait_cap;
+    url += "&field82722854=" + e.extendedProps.consent;
+    url += "&field82722855=" + e.extendedProps.student_special_perm;
+    url += "&field82722860=" + e.extendedProps.campus_code;
+    url += "&field82722861=" + e.extendedProps.academic_organization_code;
+    url += "&field82722862=" + e.extendedProps.academic_career_code;
+    url += "&field82722859=" + e.extendedProps.schedule_print;
+    url += "&field82722865=" + e.extendedProps.section_combined;
+    url += "&field82722864=" + e.extendedProps.combined_section;
+    url += "&field82722863=" + e.extendedProps.course_topic;
+    url += "&field82722848H=" + start[0].padStart(2, "0");
+    url += "&field82722848I=" + start[1].substring(0, 2);
+    url +=
+      "&field82722848A=" +
+      start[1].substring(start[1].length - 2).toUpperCase();
+    url += "&field82722849H=" + end[0].padStart(2, "0");
+    url += "&field82722849I=" + end[1].substring(0, 2);
+    url +=
+      "&field82722849A=" + end[1].substring(end[1].length - 2).toUpperCase();
+    url += "&field82722867=" + this.state.from.name;
+    url += "&field82722868=" + this.state.from.email;
+    url += "&field82722833=" + this.state.approver.email;
+    url += "&field82722832=" + this.state.approver.name;
+    //console.log(encodeURI(url));
+    return encodeURI(url);
+  }
+
+  courseChangeURL() {
     let url = "https://ucdenverdata.formstack.com/forms/course_change_form?";
     const e = this.props.currentEvent;
 
@@ -59,7 +122,7 @@ class FSButton extends React.Component {
     url += "&field82664095=" + e.extendedProps.course_title;
     url += "&field82662294=" + e.extendedProps.instructor_name;
     url += "&field82672947=" + e.extendedProps.instructor_email;
-    url += "&field82672583=" + e.extendedProps.enrollment_cap;
+    url += "&field82672583=" + e.extendedProps.enrollment_cap; //For display only
     url += "&field84502599=" + e.extendedProps.enrollment_total;
     url += "&field82673425=" + e.extendedProps.instructor_role_code;
     url += "&field82673429=" + e.extendedProps.instructor_mode_code;
@@ -99,6 +162,13 @@ class FSButton extends React.Component {
   }
 
   changeApprover = e => {
+    //console.log("e is " + e);
+    if (e === "Formstack Approver") {
+      this.setState({
+        approver: { name: "", email: "" }
+      });
+      return;
+    }
     let approver = approvers.find(({ id }) => id === e);
     //let approver = {name: formstack};
     this.setState({
@@ -107,6 +177,13 @@ class FSButton extends React.Component {
   };
 
   changeFrom = e => {
+    if (e === "Your Name") {
+      this.setState({
+        from: { name: "", email: "" }
+      });
+      return;
+    }
+
     let from = requestors.find(({ id }) => id === e);
     //let approver = {name: formstack};
     this.setState({
@@ -118,17 +195,17 @@ class FSButton extends React.Component {
     console.log(event.target.value);
   }
 
+  onCheckboxChange() {
+    this.setState({
+      add: !this.state.add
+    });
+  }
+
   render() {
-    if (
-      new Date() >
-      new Date(this.props.currentEvent.extendedProps.class_start_date)
-    ) {
-      return null;
-    }
     return (
       <form
         className="formstack"
-        action={this.getUrl()}
+        action={this.state.add ? this.addCourseURL() : this.courseChangeURL()}
         method="post"
         target="_blank"
       >
@@ -138,18 +215,28 @@ class FSButton extends React.Component {
             onSelectChange={this.changeFrom}
             data={requestors}
           />
-
           <CustomSelect
             name="Formstack Approver"
             onSelectChange={this.changeApprover}
             data={approvers}
+          />
+          <ToggleSwitch
+            id="Add"
+            key="Add"
+            className="add_toggle"
+            Text={["Add", "Add"]}
+            Name="Add Toggle"
+            onChange={this.onCheckboxChange}
+            defaultChecked={!this.state.isFutureCourse}
+            Small={false}
+            disabled={!this.state.isFutureCourse}
           />
           <button
             className="fc-button fc-button-primary"
             type="submit"
             disabled={this.validateAndSubmit()}
           >
-            Go
+            {this.state.add ? "Add/Clone" : "Change"}
           </button>
         </div>
       </form>

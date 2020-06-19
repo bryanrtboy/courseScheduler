@@ -1,0 +1,15 @@
+.formstack {
+  padding-right: 40px;
+}
+.formstack button {
+  margin-left: 20px;
+  min-width: 160px;
+}
+
+.formstack .checkbox {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  vertical-align: bottom;
+}

@@ -1,0 +1,11 @@
+{
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@mymods/modui-framework).+\\.js$"
+    ],
+    "transform": {
+      "^.+\\.(ts|html)$": "<rootDir>/node_modules/jest-preset-angular/preprocessor.js",
+      "^.+\\.js$": "babel-jest"
+    }
+  }
+}

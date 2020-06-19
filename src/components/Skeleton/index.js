@@ -13,7 +13,9 @@ class Skeleton extends React.Component {
         <table id="skeleton">
           <tbody>
             <tr>
-              <td>Requesting data...</td>
+              <td>
+                <h2>Requesting data...</h2>
+              </td>
             </tr>
             <tr>
               <td>

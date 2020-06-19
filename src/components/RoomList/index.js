@@ -1,13 +1,44 @@
 import React from "react";
 import _ from "lodash";
+import Filter from "../Filter/";
 import { formatAMPM } from "../FormattingUtilities.js";
 import "./roomlist.css";
 
 class RoomList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { value: "", grouped: [], events: [] };
     this.handleChange = this.handleChange.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
+
+  componentDidMount() {
+    this.updateAllEvents();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.events !== this.props.events ||
+      prevState.value !== this.state.value
+    ) {
+      this.updateAllEvents();
+    }
+  }
+
+  updateAllEvents() {
+    let grouped = this.getAllEvents();
+
+    this.setState({
+      grouped: grouped,
+      events: this.props.events
+    });
+  }
+
+  handleFilterChange = event => {
+    this.setState({
+      value: event.target.value
+    });
+  };
 
   handleChange = event => e => {
     if (typeof this.props.onClick === "function") this.props.onClick(event);
@@ -65,11 +96,20 @@ class RoomList extends React.Component {
           " " +
           roomKeys[j];
         //console.log(r);
-        grouped.push({
-          id: bldgKeys[i],
-          displayName: displayName,
-          rooms: r
-        });
+        let include = true;
+        if (
+          this.state.value.length > 0 &&
+          !displayName.toLowerCase().includes(this.state.value.toLowerCase())
+        ) {
+          include = false;
+        }
+        if (include) {
+          grouped.push({
+            id: bldgKeys[i],
+            displayName: displayName,
+            rooms: r
+          });
+        }
       }
     }
 
@@ -79,48 +119,55 @@ class RoomList extends React.Component {
 
   render() {
     return (
-      <div className="courselisting buildings">
-        {this.getAllEvents().map(resource => (
-          <table key={resource.id}>
-            <tbody>
-              <tr>
-                <th colSpan="3">
-                  <h2>{resource.displayName}</h2>
-                </th>
-              </tr>
-              {resource.rooms.map(event => (
-                <tr
-                  key={event.extendedProps.key}
-                  className={
-                    event.extendedProps.schedule_print.toLowerCase() +
-                    "-scheduled-print " +
-                    " " +
-                    (event.extendedProps.room_conflict === true
-                      ? "room-conflict"
-                      : " ")
-                  }
-                >
-                  <td className="meeting-pattern">
-                    <strong>
-                      {event.extendedProps.standard_meeting_pattern}
-                    </strong>
-                  </td>
-                  <td className="time">
-                    {formatAMPM(event.startTime) +
-                      "-" +
-                      formatAMPM(event.endTime)}{" "}
-                  </td>
-                  <td className="main">
-                    <strong onClick={this.handleChange(event)}>
-                      {event.extendedProps.subject_code + " " + event.title}
-                    </strong>
-                    <p>{event.extendedProps.last_name}</p>
-                  </td>
+      <div>
+        <Filter
+          label="Building or Room Filter"
+          value={this.value}
+          onChange={this.handleFilterChange}
+        />
+        <div className="courselisting buildings">
+          {this.getAllEvents().map(resource => (
+            <table key={resource.id}>
+              <tbody>
+                <tr>
+                  <th colSpan="3">
+                    <h2>{resource.displayName}</h2>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
+                {resource.rooms.map(event => (
+                  <tr
+                    key={event.extendedProps.key}
+                    className={
+                      event.extendedProps.schedule_print.toLowerCase() +
+                      "-scheduled-print " +
+                      " " +
+                      (event.extendedProps.room_conflict === true
+                        ? "room-conflict"
+                        : " ")
+                    }
+                  >
+                    <td className="meeting-pattern">
+                      <strong>
+                        {event.extendedProps.standard_meeting_pattern}
+                      </strong>
+                    </td>
+                    <td className="time">
+                      {formatAMPM(event.startTime) +
+                        "-" +
+                        formatAMPM(event.endTime)}{" "}
+                    </td>
+                    <td className="main">
+                      <strong onClick={this.handleChange(event)}>
+                        {event.extendedProps.subject_code + " " + event.title}
+                      </strong>
+                      <p>{event.extendedProps.last_name}</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ))}
+        </div>
       </div>
     );
   }

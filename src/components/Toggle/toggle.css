@@ -7,8 +7,9 @@
   -moz-user-select: none;
   -ms-user-select: none;
   text-align: left;
-  margin: 0;
+  margin: 0 10px;
 }
+
 .toggle-switch-checkbox {
   display: none;
 }
@@ -31,10 +32,10 @@
   display: block;
   float: left;
   width: 50%;
-  height: 34px;
+  height: 30px;
   padding: 0;
-  line-height: 34px;
-  font-size: 14px;
+  line-height: 30px;
+  font-size: 12px;
   color: white;
   font-weight: bold;
   box-sizing: border-box;
@@ -43,7 +44,7 @@
   content: "Yes";
   text-transform: uppercase;
   padding-left: 10px;
-  background-color: #f90;
+  background-color: #2c3e50;
   color: #fff;
 }
 .toggle-switch-disabled {
@@ -64,7 +65,7 @@
 }
 .toggle-switch-switch {
   display: block;
-  width: 24px;
+  width: 20px;
   margin: 5px;
   background: #fff;
   position: absolute;

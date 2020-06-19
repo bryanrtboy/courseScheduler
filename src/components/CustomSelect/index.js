@@ -4,10 +4,10 @@ import "./customselect.css";
 function CustomSelect(props) {
   const [data] = useState(props.data);
   const name = useState(props.name);
+  // eslint-disable-next-line
   const [selectedData, updateSelectedData] = useState("");
 
   function handleChange(event) {
-    console.log(selectedData);//Do this to prevent ESLint warning
     updateSelectedData(event.target.value);
     if (props.onSelectChange) props.onSelectChange(event.target.value);
   }
@@ -19,11 +19,7 @@ function CustomSelect(props) {
   ));
 
   return (
-    <select
-      name="customSearch"
-      className="custom-search-select"
-      onChange={handleChange}
-    >
+    <select name="customSearch" className="select-css" onChange={handleChange}>
       <option>{name}</option>
       {options}
     </select>
