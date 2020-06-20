@@ -53,13 +53,13 @@ class InstructorList extends React.Component {
     }
 
     allEvents.sort(function(a, b) {
-      let x = a.extendedProps.last_name,
-        y = b.extendedProps.last_name;
+      let x = a.extendedProps.instructor_name,
+        y = b.extendedProps.instructor_name;
       return x === y ? 0 : x < y ? -1 : 1;
     });
 
     let groupedBuildings = _.groupBy(allEvents, function(o) {
-      return o.extendedProps.last_name;
+      return o.extendedProps.instructor_name;
     });
     //console.log(groups);
     for (let key in groupedBuildings)
@@ -71,7 +71,7 @@ class InstructorList extends React.Component {
 
     _.forEach(groupedBuildings, function(value, key) {
       groupedBuildings[key] = _.groupBy(groupedBuildings[key], function(item) {
-        return item.extendedProps.last_name;
+        return item.extendedProps.instructor_name;
       });
     });
 
