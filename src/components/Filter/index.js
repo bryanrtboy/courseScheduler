@@ -10,12 +10,12 @@ class Filter extends React.Component {
   render() {
     return (
       <div className="list-filter">
+        <label htmlFor="search">{this.props.label + ": "} </label>
         <input
           type="text"
           value={this.props.value}
           onChange={this.props.onChange}
         />
-        <label htmlFor="search">{this.props.label} </label>
       </div>
     );
   }

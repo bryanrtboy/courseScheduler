@@ -112,6 +112,7 @@ function rawEventsToDotSyntax(courses) {
         dupeCheck.push(d);
       } else {
         if (
+          course["BUILDING_ID"] === "D_REMOTE" ||
           course["SUBJECT_CODE"] === "PMUS" ||
           course["COMBINED_SECTION"] === "C" ||
           course["ACADEMIC_CAREER_CODE"] === "GRAD"

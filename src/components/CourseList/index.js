@@ -101,7 +101,7 @@ class CourseList extends React.Component {
         let include = true;
         if (
           this.state.value.length > 0 &&
-          !r[0].extendedProps.catalog_number.includes(this.state.value)
+          !displayName.toLowerCase().includes(this.state.value.toLowerCase())
         ) {
           include = false;
         }
@@ -125,7 +125,7 @@ class CourseList extends React.Component {
     return (
       <div>
         <Filter
-          label="Course Number Filter"
+          label="Filter by Title or Number"
           value={this.value}
           onChange={this.handleFilterChange}
         />
@@ -170,7 +170,10 @@ class CourseList extends React.Component {
                           ? " "
                           : " (" +
                             event.extendedProps.instructor_role_code +
-                            ")"}
+                            ") "}
+                        {event.extendedProps.enrollment_total +
+                          "/" +
+                          event.extendedProps.enrollment_cap}
                       </p>
                     </td>
                   </tr>

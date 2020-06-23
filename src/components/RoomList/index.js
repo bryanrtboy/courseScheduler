@@ -160,7 +160,13 @@ class RoomList extends React.Component {
                       <strong onClick={this.handleChange(event)}>
                         {event.extendedProps.subject_code + " " + event.title}
                       </strong>
-                      <p>{event.extendedProps.last_name}</p>
+                      <p>
+                        {event.extendedProps.last_name +
+                          " " +
+                          event.extendedProps.enrollment_total +
+                          "/" +
+                          event.extendedProps.enrollment_cap}
+                      </p>
                     </td>
                   </tr>
                 ))}

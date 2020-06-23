@@ -6,13 +6,16 @@
 .list-filter input {
   background: rgb(44, 62, 80);
   color: #fff;
-  height: 20px;
+  height: 22px;
   font-weight: bold;
   text-transform: uppercase;
+  border: none;
+  padding: 0 10px;
 }
 
 .list-filter label {
   font-size: 14px;
-  margin-left: 10px;
+  margin: 0px;
   text-transform: uppercase;
+  padding-right: 15px;
 }
