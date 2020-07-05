@@ -106,7 +106,9 @@ class CourseDetail extends React.Component {
             "/" +
             this.props.currentEvent.extendedProps.enrollment_cap +
             ", Waitlist: " +
-            this.props.currentEvent.extendedProps.wait_total}
+            this.props.currentEvent.extendedProps.wait_total +
+            "/" +
+            this.props.currentEvent.extendedProps.wait_cap}
         </p>
         {finePrint}
       </div>

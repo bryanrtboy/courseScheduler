@@ -174,6 +174,13 @@ class CourseList extends React.Component {
                         {event.extendedProps.enrollment_total +
                           "/" +
                           event.extendedProps.enrollment_cap}
+                        {event.extendedProps.wait_total > 0
+                          ? " (" +
+                            event.extendedProps.wait_total +
+                            "/" +
+                            event.extendedProps.wait_cap +
+                            ")"
+                          : ""}
                       </p>
                     </td>
                   </tr>

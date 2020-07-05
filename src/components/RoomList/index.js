@@ -161,11 +161,22 @@ class RoomList extends React.Component {
                         {event.extendedProps.subject_code + " " + event.title}
                       </strong>
                       <p>
-                        {event.extendedProps.last_name +
-                          " " +
-                          event.extendedProps.enrollment_total +
+                        {event.extendedProps.last_name}{" "}
+                        {event.extendedProps.instructor_role_code === "PI"
+                          ? " "
+                          : " (" +
+                            event.extendedProps.instructor_role_code +
+                            ") "}
+                        {event.extendedProps.enrollment_total +
                           "/" +
                           event.extendedProps.enrollment_cap}
+                        {event.extendedProps.wait_total > 0
+                          ? " (" +
+                            event.extendedProps.wait_total +
+                            "/" +
+                            event.extendedProps.wait_cap +
+                            ")"
+                          : ""}
                       </p>
                     </td>
                   </tr>

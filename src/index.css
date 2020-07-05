@@ -3,7 +3,13 @@
   font-family: "Open Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
   font-size: 14px;
 }
-
+label.error {
+  display: block;
+  text-align: center;
+  color: red;
+  font-weight: bold;
+  white-space: pre-wrap;
+}
 .show-detail-true,
 .show-loading-true {
   visibility: hidden;

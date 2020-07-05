@@ -30,7 +30,8 @@ export default class App extends React.Component {
     resourceType: "buildings",
     events: [],
     view: "calendar",
-    modalEvent: ""
+    modalEvent: "",
+    errorMessage: ""
   };
   componentDidMount() {
     window.React = this;
@@ -52,14 +53,14 @@ export default class App extends React.Component {
       >
         <div className="modal">
           <div className="modal-main">
-            <FormStack isVisible={false} currentEvent={this.state.modalEvent} />{" "}
+            <FormStack isVisible={false} currentEvent={this.state.modalEvent} />
             <CourseDetail
               currentEvent={this.state.modalEvent}
               latestUpdateVisible={this.state.latestUpdatedEvent}
               showFinePrint={true}
-            />{" "}
-          </div>{" "}
-        </div>{" "}
+            />
+          </div>
+        </div>
       </Modal>
     ) : null;
 
@@ -98,8 +99,8 @@ export default class App extends React.Component {
         <div className="modal">
           <div className="modal-main">
             <Skeleton />
-          </div>{" "}
-        </div>{" "}
+          </div>
+        </div>
       </Modal>
     ) : null;
 
@@ -113,8 +114,7 @@ export default class App extends React.Component {
 
     return (
       <div className="planner-app">
-        {" "}
-        {modal}{" "}
+        {modal}
         <div
           className={
             "planner-app-top " + this.state.resourceType + " " + this.state.view
@@ -132,7 +132,7 @@ export default class App extends React.Component {
                 onClick={this.handleViewChange}
                 name="LIST VIEW"
               />
-            </div>{" "}
+            </div>
             <div className="fc-button-group">
               <Button
                 className="buildings fc-previousSemester-button fc-button fc-button-primary"
@@ -149,7 +149,7 @@ export default class App extends React.Component {
                 onClick={this.handleResourceChange}
                 name="courses"
               />
-            </div>{" "}
+            </div>
             <div className="fc-button-group semester-navigation">
               <Button
                 className="previous fc-previousSemester-button fc-button fc-button-primary"
@@ -172,19 +172,18 @@ export default class App extends React.Component {
                     : "Get Data for " +
                       semesterCodes[this.state.currentSemesterPosition].value
                 }
-              />{" "}
+              />
               <Button
                 className="next fc-nextSemester-button fc-button fc-button-primary"
                 onClick={this.goToSelectedSemester}
                 name=" > "
               />
-            </div>{" "}
-          </div>{" "}
-        </div>{" "}
+            </div>
+          </div>
+        </div>
         <div className={"planner-app-top " + this.state.resourceType}>
-          {" "}
-          {toggles}{" "}
-        </div>{" "}
+          {toggles}
+        </div>
         <div
           className={
             "main-display-area planner-app-calendar " +
@@ -196,9 +195,14 @@ export default class App extends React.Component {
             this.state.resourceType
           }
         >
-          {" "}
-          {calendarView} {skeleton} {courselistingView}{" "}
-        </div>{" "}
+          <label className="error">
+            {this.state.errorMessage
+              ? this.state.errorMessage +
+                "\n\n Use 'https' and not 'http' to access this site! \n\nThe correct URL is: https://designucd.com/cam/"
+              : ""}
+          </label>
+          {calendarView} {skeleton} {courselistingView}
+        </div>
       </div>
     );
   }
@@ -372,9 +376,18 @@ export default class App extends React.Component {
       "https://designucd.com/fetching.php?term=" +
       semesterCodes[this.state.currentSemesterPosition].key +
       "&campus=DC";
-
+    let error;
+    ("");
     fetch(fetchPhp)
       .then(response => response.json())
+      .catch(err => {
+        console.log(err);
+        error = err.toString();
+        this.setState({
+          isLoading: false,
+          errorMessage: error
+        });
+      })
       .then(data => {
         let eventSources = getEventSources(data, this.state.currentToggles);
         let resources = this.populateResources(
@@ -401,7 +414,8 @@ export default class App extends React.Component {
           events: eventSources,
           resources: resources,
           isLoading: false,
-          showToggles: true
+          showToggles: true,
+          errorMessage: error
         });
       });
   };
