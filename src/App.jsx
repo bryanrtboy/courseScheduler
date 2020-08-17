@@ -39,9 +39,12 @@ export default class App extends React.Component {
     modalRoot.id = "modal-root";
     document.body.appendChild(modalRoot);
     let today = new Date();
-    let todayPos = this.getSemesterPositionAtCalendarDate(today);
+    let todayPos = this.getSemesterPositionAtCalendarDate(today) + 1;
+    let initialDate = new Date(semesterCodes[todayPos].startDate);
+    this.forceCalendarRefresh();
     this.setState({
-      currentSemesterPosition: todayPos
+      currentSemesterPosition: todayPos,
+      currentCalendarDate: initialDate
     });
   }
 

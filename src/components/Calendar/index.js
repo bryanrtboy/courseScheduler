@@ -41,6 +41,7 @@ class Calendar extends React.Component {
   };
   componentDidMount() {
     let calendarApi = this.props.calendarRef.current.getApi();
+    calendarApi.initialDate = this.props.state.currentCalendarDate;
     this.setState({
       viewTitle: calendarApi.view.title
     });
@@ -55,7 +56,7 @@ class Calendar extends React.Component {
         <FullCalendar
           ref={this.props.calendarRef}
           timeZone="America/Denver"
-          initialView="resourceTimelineThreeDays"
+          initialView="resourceTimelineWeek"
           height="auto"
           aspectRatio={1}
           customButtons={{
@@ -72,14 +73,14 @@ class Calendar extends React.Component {
               click: this.today
             },
             toggleWeekends: {
-              text: "S/S",
+              text: "S/Su",
               click: this.props.toggleWeekends
             }
           }}
           headerToolbar={{
             left: "goPrev,goNext goToday",
             right:
-              "resourceTimelineMonth,resourceTimelineWeek,resourceTimelineThreeDays,resourceTimelineDay"
+              "resourceTimelineMonth,resourceTimelineWeek,resourceTimelineThreeDays,resourceTimelineDay toggleWeekends"
           }}
           initialDate={this.props.state.currentCalendarDate}
           allDaySlot={false}
@@ -170,16 +171,16 @@ class Calendar extends React.Component {
               buttonText: "day",
               type: "resourceTimeline",
               allDaySlot: false,
-              weekends: true,
+              //weekends: true,
               slotDuration: "00:15:00"
             },
             resourceTimelineWeek: {
               buttonText: "week",
               type: "resourceTimeline",
               slotMaxTime: "20:00:00",
-              duration: {
-                days: 5
-              },
+              // duration: {
+              //   days: 5
+              // },
               slotDuration: "03:00:00"
             }
           }}

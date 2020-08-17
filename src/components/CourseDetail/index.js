@@ -38,21 +38,22 @@ class CourseDetail extends React.Component {
       );
 
     const finePrint = this.props.showFinePrint ? (
-      <p className="fine-print">
-        {"Course ID: " +
-          this.props.currentEvent.extendedProps.course_id +
-          ", Class Number: " +
-          this.props.currentEvent.extendedProps.class_number +
-          ", Term: " +
-          this.props.currentEvent.extendedProps.term_code +
-          " – " +
-          this.props.currentEvent.title +
-          "– was last updated on " +
-          this.props.currentEvent.extendedProps.last_data_updated_date +
-          ". The most recent update for all visible courses was " +
-          this.props.latestUpdateVisible +
-          "."}
-      </p>
+      <div>
+        <p>
+          {"Course ID: " +
+            this.props.currentEvent.extendedProps.course_id +
+            ", Class Number: " +
+            this.props.currentEvent.extendedProps.class_number +
+            ", Term: " +
+            this.props.currentEvent.extendedProps.term_code +
+            ". "}
+        </p>
+        <p className="fine-print">
+          {"System data was last updated on " +
+            this.props.currentEvent.extendedProps.last_data_updated_date +
+            ". New data is fetched weekdays at 10:00 AM MST."}
+        </p>
+      </div>
     ) : null;
 
     return (

@@ -26,9 +26,12 @@ class FSButton extends React.Component {
   }
 
   componentDidMount() {
+    var date = new Date(); // Now
+    date.setDate(date.getDate() - 30);
+
+    //If this continues to be a problem, I guess we could use the class_end_date....
     let isFutureCourse =
-      new Date() <
-      new Date(this.props.currentEvent.extendedProps.class_start_date);
+      date < new Date(this.props.currentEvent.extendedProps.class_start_date);
 
     this.setState({
       isFutureCourse: isFutureCourse,
