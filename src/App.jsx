@@ -376,7 +376,7 @@ export default class App extends React.Component {
     //https://cors-anywhere.herokuapp.com/
 
     let fetchPhp =
-      "https://designucd.com/fetching.php?term=" +
+      "https://cors-anywhere.herokuapp.com/https://designucd.com/fetchingdev.php?term=" +
       semesterCodes[this.state.currentSemesterPosition].key +
       "&campus=DC";
     let error;

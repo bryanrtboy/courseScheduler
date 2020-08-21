@@ -79,14 +79,21 @@ function rawEventsToDotSyntax(courses) {
     const endDate = course["CLASS_END_DATE"];
     const startRecur = new Date(startDate);
     const endRecur = new Date(endDate);
-    let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"].toString();
+    //let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"].toString();
+    let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"];
     const daysOfWeek = getDaysOfWeek(course["STANDARD_MEETING_PATTERN"]);
-    const name = course["INSTRUCTOR_NAME"].split(",");
-    const last = name[0];
+    //const name = course["INSTRUCTOR_NAME"].split(",");
+    const name = course["INSTRUCTOR_NAME"];
+    const last = course["INSTRUCTOR_LAST_NAME"];
     if (course["SCHEDULE_PRINT"] !== "Y") {
       longtitle += " (H)";
     }
     const updatedAt = new Date(course["LAST_DATA_UPDATED_DATE"]);
+
+    let buildId = course["BUILDING_ID"];
+    if (buildId === null) {
+      buildId = "D_NONE";
+    }
 
     let room_conflict = false;
     let has_other_teacher = false;
@@ -153,8 +160,8 @@ function rawEventsToDotSyntax(courses) {
         meeting_time_start: course["MEETING_TIME_START"],
         meeting_time_end: course["MEETING_TIME_END"],
         class_start_date: course["CLASS_START_DATE"],
-        building_id: course["BUILDING_ID"],
-        room_number: course["ROOM_NUMBER"].toString(),
+        building_id: buildId,
+        room_number: course["ROOM_NUMBER"],
         course_id: course["COURSE_ID"],
         academic_career_code: course["ACADEMIC_CAREER_CODE"],
         academic_organization_code: course["ACADEMIC_ORGANIZATION_CODE"],
@@ -241,14 +248,15 @@ function parseEventsToSubjectCodes(courses, eventToggles) {
   return temp;
 }
 function formatBuildingID(course) {
-  const id = course["BUILDING_ID"] + course["ROOM_NUMBER"].toString();
+  //console.log("Building is" + course["BUILDING_ID"]);
+  let buildId = course["BUILDING_ID"];
+  if (buildId === null) {
+    buildId = "D_NULL";
+  }
+  const id = buildId + course["ROOM_NUMBER"];
   const title =
-    course["BUILDING_ID"].substring(course["BUILDING_ID"].length - 4) +
-    " " +
-    course["ROOM_NUMBER"].toString();
-  const resource = course["BUILDING_ID"].substring(
-    course["BUILDING_ID"].length - 4
-  );
+    buildId.substring(buildId.length - 4) + " " + course["ROOM_NUMBER"];
+  const resource = buildId.substring(buildId.length - 4);
   return {
     id,
     title,
@@ -270,10 +278,8 @@ function formatCourseID(course) {
 function formatInstructorID(course) {
   const id = course["INSTRUCTOR_EMPL_ID"];
   const title = course["INSTRUCTOR_NAME"];
-  const resource = course["INSTRUCTOR_NAME"].substr(
-    0,
-    course["INSTRUCTOR_NAME"].indexOf(",")
-  );
+
+  const resource = course["INSTRUCTOR_LAST_NAME"];
   return {
     id,
     title,

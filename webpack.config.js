@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const packageMeta = require("./package.json");
 
 module.exports = {
-  mode: "production",
+  mode: "development",
   devtool: "source-map",
   entry: "./src/index.js",
   resolve: {
