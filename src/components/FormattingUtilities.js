@@ -83,8 +83,14 @@ function rawEventsToDotSyntax(courses) {
     let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"];
     const daysOfWeek = getDaysOfWeek(course["STANDARD_MEETING_PATTERN"]);
     //const name = course["INSTRUCTOR_NAME"].split(",");
-    const name = course["INSTRUCTOR_NAME"];
-    const last = course["INSTRUCTOR_LAST_NAME"];
+    let name = course["INSTRUCTOR_NAME"];
+    if (name === null || name.length < 1) {
+      name = "-";
+    }
+    let last = course["INSTRUCTOR_LAST_NAME"];
+    if (last === null || last.length < 1) {
+      last = "-";
+    }
     if (course["SCHEDULE_PRINT"] !== "Y") {
       longtitle += " (H)";
     }
