@@ -12,12 +12,12 @@ class FSButton extends React.Component {
     super(props);
     this.courseChangeURL = this.courseChangeURL.bind(this);
     this.addCourseURL = this.addCourseURL.bind(this);
-    this.changeApprover = this.changeApprover.bind(this);
+    //this.changeApprover = this.changeApprover.bind(this);
     this.validateAndSubmit = this.validateAndSubmit.bind(this);
     this.changeFrom = this.changeFrom.bind(this);
     this.onCheckboxChange = this.onCheckboxChange.bind(this);
     this.state = {
-      approver: { name: "", email: "" },
+      approver: { name: "Sonia Brown", email: "sonia.brown@ucdenver.edu" },
       from: { name: "", email: "" },
       add: false,
       isFutureCourse: true,
@@ -88,8 +88,8 @@ class FSButton extends React.Component {
     url += "&field82722861=" + e.extendedProps.academic_organization_code;
     url += "&field82722862=" + e.extendedProps.academic_career_code;
     url += "&field82722859=" + e.extendedProps.schedule_print;
-    url += "&field82722865=" + e.extendedProps.section_combined;
     url += "&field82722864=" + e.extendedProps.combined_section;
+    url += "&field82722865=" + e.extendedProps.section_combined_description;
     url += "&field82722863=" + e.extendedProps.course_topic;
     url += "&field82722848H=" + start[0].padStart(2, "0");
     url += "&field82722848I=" + start[1].substring(0, 2);
@@ -109,6 +109,7 @@ class FSButton extends React.Component {
   }
 
   courseChangeURL() {
+    //When adding new fields, you need to also edit FormattingUtilities.js to match the API with these names
     let url = "https://ucdenverdata.formstack.com/forms/course_change_form?";
     const e = this.props.currentEvent;
 
@@ -144,8 +145,9 @@ class FSButton extends React.Component {
     url += "&field82673550=" + e.extendedProps.academic_organization_code;
     url += "&field82673707=" + e.extendedProps.academic_career_code;
     url += "&field82673730=" + e.extendedProps.schedule_print;
-    url += "&field82673711=" + e.extendedProps.section_combined;
-    url += "&field82673727=" + e.extendedProps.combined_section;
+    url += "&field82673711=" + e.extendedProps.combined_section;
+    url += "&field82673727=" + e.extendedProps.section_combined_description;
+    url += "&field101479305=" + e.extendedProps.section_combined_code;
     url += "&field82673709=" + e.extendedProps.course_topic;
     url += "&field82663458H=" + start[0].padStart(2, "0");
     url += "&field82663458I=" + start[1].substring(0, 2);
@@ -164,20 +166,20 @@ class FSButton extends React.Component {
     return encodeURI(url);
   }
 
-  changeApprover = e => {
-    //console.log("e is " + e);
-    if (e === "Formstack Approver") {
-      this.setState({
-        approver: { name: "", email: "" }
-      });
-      return;
-    }
-    let approver = approvers.find(({ id }) => id === e);
-    //let approver = {name: formstack};
-    this.setState({
-      approver: { name: approver.name, email: approver.id }
-    });
-  };
+  // changeApprover = e => {
+  //   //console.log("e is " + e);
+  //   if (e === "Formstack Approver") {
+  //     this.setState({
+  //       approver: { name: "", email: "" }
+  //     });
+  //     return;
+  //   }
+  //   let approver = approvers.find(({ id }) => id === e);
+  //   //let approver = {name: formstack};
+  //   this.setState({
+  //     approver: { name: approver.name, email: approver.id }
+  //   });
+  // };
 
   changeFrom = e => {
     if (e === "Your Name") {
@@ -218,11 +220,11 @@ class FSButton extends React.Component {
             onSelectChange={this.changeFrom}
             data={requestors}
           />
-          <CustomSelect
+          {/*<CustomSelect
             name="Formstack Approver"
             onSelectChange={this.changeApprover}
             data={approvers}
-          />
+          />*/}
           <ToggleSwitch
             id="Add"
             key="Add"
