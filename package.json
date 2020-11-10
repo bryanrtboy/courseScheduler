@@ -19,7 +19,7 @@
     "@fullcalendar/react": "^5.0.0",
     "@fullcalendar/timegrid": "^5.0.0",
     "@fullcalendar/resource-timeline": "^5.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-instagram-embed": "^1.5.0"
