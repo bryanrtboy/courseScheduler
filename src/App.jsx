@@ -11,6 +11,8 @@ import Skeleton from "./components/Skeleton/";
 import SubjectToggles from "./components/SubjectToggles/";
 import { getEventSources } from "./components/FormattingUtilities.js";
 import semesterCodes from "./data/semesterCodes.json";
+//For development use Sample data...
+//import sampleData from "./data/sampleResponse.json";
 
 export default class App extends React.Component {
   fullCalendarRef = React.createRef();
@@ -373,6 +375,7 @@ export default class App extends React.Component {
       isLoading: true,
       showToggles: false
     });
+    //As of January 2021, CORS anywhere does not work...
     //https://cors-anywhere.herokuapp.com/
 
     let fetchPhp =
@@ -381,6 +384,8 @@ export default class App extends React.Component {
       "&campus=DC";
     let error;
     ("");
+    //For development change data to 'sampleData' in 2 places below, which will be Fall 2021 data
+    //You will also need to uncomment the import sampleData line at the top of the page
     fetch(fetchPhp)
       .then(response => response.json())
       .catch(err => {
