@@ -11,8 +11,6 @@ import Skeleton from "./components/Skeleton/";
 import SubjectToggles from "./components/SubjectToggles/";
 import { getEventSources } from "./components/FormattingUtilities.js";
 import semesterCodes from "./data/semesterCodes.json";
-//For development use Sample data...
-//import sampleData from "./data/sampleResponse.json";
 
 export default class App extends React.Component {
   fullCalendarRef = React.createRef();
@@ -270,7 +268,7 @@ export default class App extends React.Component {
         rebuiltEvents.push(updateRawEvents[i]);
       }
     }
-    //console.log("Getting the " + resourceType);
+    //console.log("Current events are  " + resourceType);
     //Get the data and format based on new resources type
     this.setState({
       resourceType: resourceType,
@@ -330,6 +328,48 @@ export default class App extends React.Component {
       rebuiltEvents,
       this.state.resourceType
     );
+
+    if (rebuiltEvents.length > 0) {
+      for (let i = 0; i < rebuiltEvents.length; i++) {
+        let teacherCount = 0;
+        let studentCount = 0;
+        let aidCount = 0;
+        if (rebuiltEvents[i].events.length > 0) {
+          for (let j = 0; j < rebuiltEvents[i].events.length; j++) {
+            if (
+              rebuiltEvents[i].events[j].extendedProps.instructor_role_code ===
+              "PI"
+            ) {
+              teacherCount++;
+              studentCount +=
+                rebuiltEvents[i].events[j].extendedProps.enrollment_total;
+            }
+
+            if (
+              rebuiltEvents[i].events[j].extendedProps.instructor_role_code ===
+              "TA"
+            ) {
+              aidCount++;
+            }
+          }
+        }
+
+        let mess =
+          rebuiltEvents[i].id +
+          " teacherCount is  " +
+          teacherCount +
+          ", studentCount is " +
+          studentCount +
+          ". Student teacher ratio = " +
+          parseFloat(studentCount / teacherCount).toFixed(2);
+
+        if (aidCount > 0) {
+          mess = mess + ", without including " + aidCount + " teacher aids";
+        }
+
+        console.log(mess);
+      }
+    }
     this.setState({
       events: rebuiltEvents,
       rawEvents: updateRawEvents,
@@ -378,15 +418,25 @@ export default class App extends React.Component {
     //As of January 2021, CORS anywhere does not work...
     //https://cors-anywhere.herokuapp.com/
 
-    let fetchPhp =
-      "https://designucd.com/fetching.php?term=" +
-      semesterCodes[this.state.currentSemesterPosition].key +
-      "&campus=DC";
+    //For development uncomment the line below to use a local
+    //static copy of the data for Fall 2021
+
+    let fetchPhp = "./public/sampleResponse.json";
+
+    // let fetchPhp =
+    //   "https://designucd.com/fetching.php?term=" +
+    //   semesterCodes[this.state.currentSemesterPosition].key +
+    //   "&campus=DC";
+
     let error;
     ("");
-    //For development change data to 'sampleData' in 2 places below, which will be Fall 2021 data
-    //You will also need to uncomment the import sampleData line at the top of the page
-    fetch(fetchPhp)
+
+    fetch(fetchPhp, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }
+    })
       .then(response => response.json())
       .catch(err => {
         console.log(err);
