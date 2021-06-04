@@ -3,3 +3,7 @@
   overflow: auto;
   white-space: nowrap;
 }
+
+button.disabled {
+  pointer-events: none;
+}

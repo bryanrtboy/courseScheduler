@@ -10,7 +10,7 @@ import ListView from "./components/ListView/";
 import Skeleton from "./components/Skeleton/";
 import SubjectToggles from "./components/SubjectToggles/";
 import { getEventSources } from "./components/FormattingUtilities.js";
-import semesterCodes from "./data/semesterCodes.json";
+import semesterCodes from "../public/semesterCodes.json";
 
 export default class App extends React.Component {
   fullCalendarRef = React.createRef();
@@ -46,6 +46,8 @@ export default class App extends React.Component {
       currentSemesterPosition: todayPos,
       currentCalendarDate: initialDate
     });
+
+    this.fetchEvents(todayPos);
   }
 
   render() {
@@ -161,20 +163,22 @@ export default class App extends React.Component {
               />
               <Button
                 id="current-semester-button"
-                className="this fc-thisSemester-button current-semester-button fc-button fc-button-primary"
-                onClick={
-                  this.state.currentlyFetchedSemesterPos !==
-                  this.state.currentSemesterPosition
-                    ? this.fetchEvents
-                    : null
-                }
-                name={
-                  this.state.currentlyFetchedSemesterPos ===
-                  this.state.currentSemesterPosition
-                    ? semesterCodes[this.state.currentSemesterPosition].value
-                    : "Get Data for " +
-                      semesterCodes[this.state.currentSemesterPosition].value
-                }
+                className="this fc-thisSemester-button current-semester-button fc-button fc-button-primary disabled"
+                // onClick={
+                //   this.state.currentlyFetchedSemesterPos !==
+                //   this.state.currentSemesterPosition
+                //     ? this.fetchEvents
+                //     : null
+                // }
+
+                name={semesterCodes[this.state.currentSemesterPosition].value}
+                // name={
+                //   this.state.currentlyFetchedSemesterPos ===
+                //   this.state.currentSemesterPosition
+                //     ? semesterCodes[this.state.currentSemesterPosition].value
+                //     : "Get Data for " +
+                //       semesterCodes[this.state.currentSemesterPosition].value
+                // }
               />
               <Button
                 className="next fc-nextSemester-button fc-button fc-button-primary"
@@ -201,7 +205,7 @@ export default class App extends React.Component {
           <label className="error">
             {this.state.errorMessage
               ? this.state.errorMessage +
-                "\n\n Use 'https' and not 'http' to access this site! \n\nThe correct URL is: https://designucd.com/cam/"
+                "\n\n Sorry! Bryan set this up to check 2 semesters ahead of today! \n\n Contact Assoc. Prof. Bryan Leister at bryan.leister@ucdenver.edu if you want him to change that..."
               : ""}
           </label>
           {calendarView} {skeleton} {courselistingView}
@@ -241,13 +245,14 @@ export default class App extends React.Component {
       default:
     }
     let pPos = this.state.currentSemesterPosition + p;
-    if (pPos <= 2) {
-      pPos = 2;
+    if (pPos <= 0) {
+      pPos = 0;
     }
     if (pPos >= semesterCodes.length - 3) {
       pPos = semesterCodes.length - 3;
     }
     let goToDate = semesterCodes[pPos].startDate;
+
     if (this.state.view === "calendar") {
       let calendarApi = this.fullCalendarRef.current.getApi();
       calendarApi.gotoDate(goToDate);
@@ -257,6 +262,9 @@ export default class App extends React.Component {
       currentSemesterPosition: pPos,
       currentCalendarDate: goToDate
     });
+
+    //Automatically fetch the static Data
+    this.fetchEvents(pPos);
   };
   handleResourceChange = args => {
     let buttonClicked = args.target.className;
@@ -328,48 +336,6 @@ export default class App extends React.Component {
       rebuiltEvents,
       this.state.resourceType
     );
-
-    if (rebuiltEvents.length > 0) {
-      for (let i = 0; i < rebuiltEvents.length; i++) {
-        let teacherCount = 0;
-        let studentCount = 0;
-        let aidCount = 0;
-        if (rebuiltEvents[i].events.length > 0) {
-          for (let j = 0; j < rebuiltEvents[i].events.length; j++) {
-            if (
-              rebuiltEvents[i].events[j].extendedProps.instructor_role_code ===
-              "PI"
-            ) {
-              teacherCount++;
-              studentCount +=
-                rebuiltEvents[i].events[j].extendedProps.enrollment_total;
-            }
-
-            if (
-              rebuiltEvents[i].events[j].extendedProps.instructor_role_code ===
-              "TA"
-            ) {
-              aidCount++;
-            }
-          }
-        }
-
-        let mess =
-          rebuiltEvents[i].id +
-          " teacherCount is  " +
-          teacherCount +
-          ", studentCount is " +
-          studentCount +
-          ". Student teacher ratio = " +
-          parseFloat(studentCount / teacherCount).toFixed(2);
-
-        if (aidCount > 0) {
-          mess = mess + ", without including " + aidCount + " teacher aids";
-        }
-
-        console.log(mess);
-      }
-    }
     this.setState({
       events: rebuiltEvents,
       rawEvents: updateRawEvents,
@@ -410,7 +376,7 @@ export default class App extends React.Component {
       latestUpdatedEvent: latestUpdateDate
     });
   }
-  fetchEvents = () => {
+  fetchEvents = semesterIndexPosition => {
     this.setState({
       isLoading: true,
       showToggles: false
@@ -421,7 +387,8 @@ export default class App extends React.Component {
     //For development uncomment the line below to use a local
     //static copy of the data for Fall 2021
 
-    let fetchPhp = "./public/sampleResponse.json";
+    let fetchPhp =
+      "./public/" + semesterCodes[semesterIndexPosition].key + ".json";
 
     // let fetchPhp =
     //   "https://designucd.com/fetching.php?term=" +
@@ -457,15 +424,16 @@ export default class App extends React.Component {
         for (let i = 0; i < eventSources.length; i++) {
           eventCount += eventSources[i].events.length;
         }
-        console.log(
-          "Found " +
-            eventSources.length +
-            " subjects, " +
-            eventCount +
-            "  events and " +
-            resources.length +
-            " resources."
-        );
+        this.getStudentTeacherCounts(eventSources);
+        // console.log(
+        //   "Found " +
+        //     eventSources.length +
+        //     " subjects, " +
+        //     eventCount +
+        //     "  events and " +
+        //     resources.length +
+        //     " resources."
+        // );
         this.setState({
           allEventsBySubj: eventSources,
           currentlyFetchedSemesterPos: this.state.currentSemesterPosition,
@@ -544,5 +512,47 @@ export default class App extends React.Component {
       }
     }
     return eventSources;
+  };
+  getStudentTeacherCounts = eventList => {
+    console.log(
+      "Data for " + semesterCodes[this.state.currentSemesterPosition].value
+    );
+    for (let i = 0; i < eventList.length; i++) {
+      let teacherCount = 0;
+      let studentCount = 0;
+      let aidCount = 0;
+      if (eventList[i].events.length > 0) {
+        for (let j = 0; j < eventList[i].events.length; j++) {
+          if (
+            eventList[i].events[j].extendedProps.instructor_role_code === "PI"
+          ) {
+            teacherCount++;
+            studentCount +=
+              eventList[i].events[j].extendedProps.enrollment_total;
+          }
+
+          if (
+            eventList[i].events[j].extendedProps.instructor_role_code === "TA"
+          ) {
+            aidCount++;
+          }
+        }
+      }
+
+      let mess =
+        eventList[i].id +
+        " has " +
+        teacherCount +
+        " instructors teaching " +
+        studentCount +
+        " students. The ratio is " +
+        parseFloat(studentCount / teacherCount).toFixed(2) +
+        " students per instructor.";
+
+      if (aidCount > 0) {
+        mess = mess + " Excluding " + aidCount + " TA's.";
+      }
+      console.log(mess);
+    }
   };
 }
