@@ -16,7 +16,13 @@ class CourseDetail extends React.Component {
       ({ CRSE_ID }) =>
         CRSE_ID === this.props.currentEvent.extendedProps.course_id
     );
-    const description = d ? d.CRSE_CATALOG_LD : "No Description Available.";
+    const description = d
+      ? d.CRSE_CATALOG_LD +
+        " Status: " +
+        d.STATUS +
+        ". Effective " +
+        d.EFFECTIVE_DATE.slice(0, -5)
+      : "No Description Available.";
 
     const promotion =
       d && d.URL !== "" ? (
@@ -51,7 +57,7 @@ class CourseDetail extends React.Component {
         <p className="fine-print">
           {"System data was last updated on " +
             this.props.currentEvent.extendedProps.last_data_updated_date +
-            ". New data is fetched weekdays at 10:00 AM MST."}
+            ". New data is fetched weekdays at 11:00 AM MST."}
         </p>
       </div>
     ) : null;

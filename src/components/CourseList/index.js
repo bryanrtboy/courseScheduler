@@ -88,7 +88,13 @@ class CourseList extends React.Component {
         let d = courseDescriptions.find(
           ({ CRSE_ID }) => CRSE_ID === r[0].extendedProps.course_id
         );
-        const description = d ? d.CRSE_CATALOG_LD : "No Description Available.";
+        const description = d
+          ? d.CRSE_CATALOG_LD +
+            " Status: " +
+            d.STATUS +
+            ". Effective " +
+            d.EFFECTIVE_DATE.slice(0, -5)
+          : "No Description Available.";
         //console.log(r);
         let displayName =
           r[0].extendedProps.subject_code +

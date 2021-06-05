@@ -105,7 +105,7 @@ class Calendar extends React.Component {
           weekends={this.props.state.calendarWeekends}
           progressiveEventRendering={false}
           lazyFetching={true}
-          eventSources={this.props.state.events}
+          eventSources={this.props.state.eventsVisible}
           eventContent={function(arg) {
             let articleEl = document.createElement("article");
             articleEl.style.backgroundColor = colorBySubject(

@@ -15,7 +15,7 @@ import semesterCodes from "../public/semesterCodes.json";
 export default class App extends React.Component {
   fullCalendarRef = React.createRef();
   state = {
-    allEventsBySubj: [],
+    fetchedEvents: [],
     isLoading: false,
     latestUpdatedEvent: new Date("1970-01-01"),
     showCalendar: true,
@@ -28,7 +28,7 @@ export default class App extends React.Component {
     currentToggles: [],
     resources: [],
     resourceType: "buildings",
-    events: [],
+    eventsVisible: [],
     view: "calendar",
     modalEvent: "",
     errorMessage: ""
@@ -41,12 +41,10 @@ export default class App extends React.Component {
     let today = new Date();
     let todayPos = this.getSemesterPositionAtCalendarDate(today) + 1;
     let initialDate = new Date(semesterCodes[todayPos].startDate);
-    this.forceCalendarRefresh();
     this.setState({
       currentSemesterPosition: todayPos,
       currentCalendarDate: initialDate
     });
-
     this.fetchEvents(todayPos);
   }
 
@@ -85,7 +83,7 @@ export default class App extends React.Component {
     const courselistingView =
       this.state.view === "courselistings" ? (
         <ListView
-          events={this.state.events}
+          events={this.state.eventsVisible}
           resourceType={this.state.resourceType}
           semester={
             this.state.currentlyFetchedSemesterPos !== 0
@@ -112,11 +110,10 @@ export default class App extends React.Component {
     const toggles = this.state.showToggles ? (
       <SubjectToggles
         currentToggles={this.state.currentToggles}
-        eventSources={this.state.allEventsBySubj}
+        eventSources={this.state.fetchedEvents}
         onChange={this.onToggleChange}
       />
     ) : null;
-
     return (
       <div className="planner-app">
         {modal}
@@ -164,21 +161,7 @@ export default class App extends React.Component {
               <Button
                 id="current-semester-button"
                 className="this fc-thisSemester-button current-semester-button fc-button fc-button-primary disabled"
-                // onClick={
-                //   this.state.currentlyFetchedSemesterPos !==
-                //   this.state.currentSemesterPosition
-                //     ? this.fetchEvents
-                //     : null
-                // }
-
                 name={semesterCodes[this.state.currentSemesterPosition].value}
-                // name={
-                //   this.state.currentlyFetchedSemesterPos ===
-                //   this.state.currentSemesterPosition
-                //     ? semesterCodes[this.state.currentSemesterPosition].value
-                //     : "Get Data for " +
-                //       semesterCodes[this.state.currentSemesterPosition].value
-                // }
               />
               <Button
                 className="next fc-nextSemester-button fc-button fc-button-primary"
@@ -256,35 +239,24 @@ export default class App extends React.Component {
     if (this.state.view === "calendar") {
       let calendarApi = this.fullCalendarRef.current.getApi();
       calendarApi.gotoDate(goToDate);
-      this.forceCalendarRefresh();
     }
     this.setState({
       currentSemesterPosition: pPos,
       currentCalendarDate: goToDate
     });
-
-    //Automatically fetch the static Data
     this.fetchEvents(pPos);
   };
   handleResourceChange = args => {
     let buttonClicked = args.target.className;
     let resourceType = buttonClicked.substr(0, buttonClicked.indexOf(" "));
     let updateRawEvents = this.changeResourceType(resourceType);
-    let rebuiltEvents = [];
-    for (let i = 0; i < updateRawEvents.length; i++) {
-      if (updateRawEvents[i].isVisible) {
-        rebuiltEvents.push(updateRawEvents[i]);
-      }
-    }
-    //console.log("Current events are  " + resourceType);
-    //Get the data and format based on new resources type
+    let rebuiltEvents = this.returnVisibleFromFetchedEvents(updateRawEvents);
     this.setState({
       resourceType: resourceType,
-      allEventsBySubj: updateRawEvents,
-      events: rebuiltEvents,
+      fetchedEvents: updateRawEvents,
+      eventsVisible: rebuiltEvents,
       resources: this.populateResources(rebuiltEvents, resourceType)
     });
-    //  this.updateToggleStates();
     this.forceCalendarRefresh();
   };
   handleViewChange = args => {
@@ -293,7 +265,6 @@ export default class App extends React.Component {
     this.setState({
       view: view
     });
-    this.forceCalendarRefresh();
   };
   forceCalendarRefresh = () => {
     this.setState({
@@ -319,45 +290,33 @@ export default class App extends React.Component {
       let t = { key: id, checked: checked };
       trackedKeys.push(t);
     }
-    //console.log(event);
-    let updateRawEvents = this.state.allEventsBySubj;
+    this.rebuildEventVisibility(checked, id);
+    this.setState({
+      currentToggles: trackedKeys
+    });
+  };
+  rebuildEventVisibility = (checked, id) => {
+    let updateRawEvents = this.state.fetchedEvents;
     for (let i = 0; i < updateRawEvents.length; i++) {
       if (updateRawEvents[i].id === id) {
         updateRawEvents[i].isVisible = checked;
       }
     }
-    let rebuiltEvents = [];
-    for (let i = 0; i < updateRawEvents.length; i++) {
-      if (updateRawEvents[i].isVisible) {
-        rebuiltEvents.push(updateRawEvents[i]);
-      }
-    }
+    let rebuiltEvents = this.returnVisibleFromFetchedEvents(updateRawEvents);
     let resources = this.populateResources(
       rebuiltEvents,
       this.state.resourceType
     );
     this.setState({
-      events: rebuiltEvents,
-      rawEvents: updateRawEvents,
-      currentToggles: trackedKeys,
+      eventsVisible: rebuiltEvents,
       resources: resources
     });
   };
+
   toggleWeekends = () => {
     this.setState({
       calendarWeekends: !this.state.calendarWeekends
     });
-  };
-  handleDateClick = arg => {
-    // if (confirm("Would you like to add an event to " + arg.dateStr + " ?")) {
-    //   this.setState({
-    //     events: this.state.events.concat({
-    //       title: "New Event",
-    //       start: arg.date,
-    //       allDay: arg.allDay
-    //     })
-    //   });
-    // }
   };
   getLatestUpdateDate(eventSources) {
     let latestUpdateDate = new Date("1970-01-01");
@@ -371,7 +330,6 @@ export default class App extends React.Component {
         }
       }
     }
-
     this.setState({
       latestUpdatedEvent: latestUpdateDate
     });
@@ -379,14 +337,11 @@ export default class App extends React.Component {
   fetchEvents = semesterIndexPosition => {
     this.setState({
       isLoading: true,
-      showToggles: false
+      showToggles: false,
+      showCalendar: false
     });
     //As of January 2021, CORS anywhere does not work...
-    //https://cors-anywhere.herokuapp.com/
-
-    //For development uncomment the line below to use a local
-    //static copy of the data for Fall 2021
-
+    //Change PHP to Cron job and use static files in the public folder
     let fetchPhp =
       "./public/" + semesterCodes[semesterIndexPosition].key + ".json";
 
@@ -396,7 +351,7 @@ export default class App extends React.Component {
     //   "&campus=DC";
 
     let error;
-    ("");
+    ("There was an error loading the files!");
 
     fetch(fetchPhp, {
       headers: {
@@ -414,34 +369,23 @@ export default class App extends React.Component {
         });
       })
       .then(data => {
-        let eventSources = getEventSources(data, this.state.currentToggles);
+        let fetchedEvents = getEventSources(data, this.state.currentToggles);
+        let visibleEvents = this.returnVisibleFromFetchedEvents(fetchedEvents);
         let resources = this.populateResources(
-          eventSources,
+          visibleEvents,
           this.state.resourceType
         );
-        this.getLatestUpdateDate(eventSources);
-        let eventCount = 0;
-        for (let i = 0; i < eventSources.length; i++) {
-          eventCount += eventSources[i].events.length;
-        }
-        this.getStudentTeacherCounts(eventSources);
-        // console.log(
-        //   "Found " +
-        //     eventSources.length +
-        //     " subjects, " +
-        //     eventCount +
-        //     "  events and " +
-        //     resources.length +
-        //     " resources."
-        // );
+        this.getLatestUpdateDate(fetchedEvents);
+        this.getStudentTeacherCounts(fetchedEvents);
         this.setState({
-          allEventsBySubj: eventSources,
+          fetchedEvents: fetchedEvents,
           currentlyFetchedSemesterPos: this.state.currentSemesterPosition,
-          events: eventSources,
+          eventsVisible: visibleEvents,
           resources: resources,
           isLoading: false,
           showToggles: true,
-          errorMessage: error
+          errorMessage: error,
+          showCalendar: true
         });
       });
   };
@@ -449,7 +393,6 @@ export default class App extends React.Component {
     let earliestSemester = new Date(
       semesterCodes[semesterCodes.length - 1].startDate
     );
-
     let currentPos = 0;
     for (let i = 0; i < semesterCodes.length; i++) {
       let d = new Date(semesterCodes[i].startDate);
@@ -463,6 +406,15 @@ export default class App extends React.Component {
       currentSemesterPosition: currentPos
     });
     return currentPos;
+  };
+  returnVisibleFromFetchedEvents = fetchedEvents => {
+    let visibleEvents = [];
+    for (let i = 0; i < fetchedEvents.length; i++) {
+      if (fetchedEvents[i].isVisible) {
+        visibleEvents.push(fetchedEvents[i]);
+      }
+    }
+    return visibleEvents;
   };
   populateResources = (eventSources, resourceType) => {
     let resourceIds = [];
@@ -491,7 +443,7 @@ export default class App extends React.Component {
     return currentResources;
   };
   changeResourceType = resourceType => {
-    let eventSources = this.state.allEventsBySubj;
+    let eventSources = this.state.fetchedEvents;
     for (let i = 0; i < eventSources.length; i++) {
       for (let j = 0; j < eventSources[i].events.length; j++) {
         switch (resourceType) {
@@ -517,6 +469,9 @@ export default class App extends React.Component {
     console.log(
       "Data for " + semesterCodes[this.state.currentSemesterPosition].value
     );
+
+    let camTeacherCount = 0;
+    let camStudentCount = 0;
     for (let i = 0; i < eventList.length; i++) {
       let teacherCount = 0;
       let studentCount = 0;
@@ -538,7 +493,6 @@ export default class App extends React.Component {
           }
         }
       }
-
       let mess =
         eventList[i].id +
         " has " +
@@ -553,6 +507,26 @@ export default class App extends React.Component {
         mess = mess + " Excluding " + aidCount + " TA's.";
       }
       console.log(mess);
+      if (
+        eventList[i].id === "FINE" ||
+        eventList[i].id === "FITV" ||
+        eventList[i].id === "MUSC" ||
+        eventList[i].id === "DACD" ||
+        eventList[i].id === "MSRA"
+      ) {
+        camTeacherCount += teacherCount;
+        camStudentCount += studentCount;
+      }
     }
+
+    console.log(
+      "FINE,DACD,MUSC,MSRA and FITV have " +
+        camTeacherCount +
+        " total instructors teaching " +
+        camStudentCount +
+        " students. That combined overall ratio is " +
+        parseFloat(camStudentCount / camTeacherCount).toFixed(2) +
+        " students per instructor."
+    );
   };
 }
