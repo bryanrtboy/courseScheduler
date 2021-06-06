@@ -528,5 +528,7 @@ export default class App extends React.Component {
         parseFloat(camStudentCount / camTeacherCount).toFixed(2) +
         " students per instructor."
     );
+    let today = new Date();
+    //console.log(today);
   };
 }

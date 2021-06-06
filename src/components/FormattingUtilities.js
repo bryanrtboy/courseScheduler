@@ -1,6 +1,9 @@
 export const getEventSources = (data, eventToggles) => {
   let temp = rawEventsToDotSyntax(data);
-  let courses = parseEventsToSubjectCodes(temp, eventToggles);
+  let courses = parseEventsToSubjectCodes(
+    removeEmptyPastClasses(temp),
+    eventToggles
+  );
   return courses;
 };
 export const colorBySubject = (area, saturation, lightness) => {
@@ -101,9 +104,10 @@ function rawEventsToDotSyntax(courses) {
       buildId = "D_NONE";
     }
 
+    //Start checking for Room conflicts
     let room_conflict = false;
     let has_other_teacher = false;
-    //Check for Room conflicts
+
     if (!allDay && startTime) {
       if (
         course["INSTRUCTOR_ROLE_CODE"] === "TA" ||
@@ -111,7 +115,10 @@ function rawEventsToDotSyntax(courses) {
       ) {
         has_other_teacher = true;
       }
-      //This can be improved to convert to a class d and instructor email, that way a dupe is not a dupe if emails are the same for both classes
+      //This can be improved to convert to a class d and instructor email,
+      //that way a dupe is not a dupe if emails are the same for both classes
+      //This is used to flag classes that are scheduled on top of each other,
+      //while ignoring TA's and SI instructors.
       let d =
         startTime +
         resourceId +
@@ -137,6 +144,8 @@ function rawEventsToDotSyntax(courses) {
           room_conflict = true;
         }
       }
+
+      //  console.log("Dupecheck is " + dupeCheck.length);
     }
 
     let color = colorBySubject(course["SUBJECT_CODE"], "36%", "54%");
@@ -293,6 +302,23 @@ function formatInstructorID(course) {
     resource,
     extendedProps: {}
   };
+}
+
+function removeEmptyPastClasses(events) {
+  let today = new Date();
+  today.setDate(today.getDate() - 60);
+  let temp = [];
+  //console.log(today);
+  for (let i = 0; i < events.length; i++) {
+    if (
+      events[i].startRecur > today ||
+      parseInt(events[i].extendedProps.enrollment_total) >= 1
+    ) {
+      temp.push(events[i]);
+    }
+  }
+  //console.log("Started with " + events.length + ", returned " + temp.length);
+  return temp;
 }
 // function getUniqueEvents(events) {
 //   let areas = [];
