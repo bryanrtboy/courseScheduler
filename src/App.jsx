@@ -466,21 +466,36 @@ export default class App extends React.Component {
     return eventSources;
   };
   getStudentTeacherCounts = eventList => {
+    // console.log(
+    //   "Data for " +
+    //     semesterCodes[this.state.currentSemesterPosition].value +
+    //     " excluding courses with 1 (Independent Studies).\n\n"
+    // );
+
     console.log(
-      "Data for " + semesterCodes[this.state.currentSemesterPosition].value
+      "Excluding TA's and courses with 1 enrolled, i.e. Independent Studies (IS)\n" +
+        "CAM totals also exclude MSMF, MSRA and ARTS courses\n\n" +
+        semesterCodes[this.state.currentSemesterPosition].value +
+        "\tSUBJECT\tINSTR\tENROL\tRATIO\tTA's\tIS\t"
     );
 
     let camTeacherCount = 0;
     let camStudentCount = 0;
+    let camTACount = 0;
+    let camISCount = 0;
     for (let i = 0; i < eventList.length; i++) {
       let teacherCount = 0;
       let studentCount = 0;
       let aidCount = 0;
+      let isCount = 0;
       if (eventList[i].events.length > 0) {
         for (let j = 0; j < eventList[i].events.length; j++) {
           if (
             eventList[i].events[j].extendedProps.instructor_role_code === "PI"
           ) {
+            if (eventList[i].events[j].extendedProps.enrollment_total == 1) {
+              isCount++;
+            }
             teacherCount++;
             studentCount +=
               eventList[i].events[j].extendedProps.enrollment_total;
@@ -493,42 +508,57 @@ export default class App extends React.Component {
           }
         }
       }
-      let mess =
-        eventList[i].id +
-        " has " +
-        teacherCount +
-        " instructors teaching " +
-        studentCount +
-        " students. The ratio is " +
-        parseFloat(studentCount / teacherCount).toFixed(2) +
-        " students per instructor.";
 
-      if (aidCount > 0) {
-        mess = mess + " Excluding " + aidCount + " TA's.";
+      let ratio = 0;
+      if (studentCount > 0) {
+        ratio = parseFloat(
+          (studentCount - isCount) / (teacherCount - isCount)
+        ).toFixed(2);
       }
+      let mess =
+        "            \t" +
+        eventList[i].id +
+        "\t" +
+        teacherCount +
+        "\t" +
+        studentCount +
+        "\t" +
+        ratio +
+        "\t" +
+        aidCount +
+        "\t" +
+        isCount +
+        "\t";
       console.log(mess);
       if (
-        eventList[i].id === "FINE" ||
-        eventList[i].id === "FITV" ||
-        eventList[i].id === "MUSC" ||
-        eventList[i].id === "DACD" ||
-        eventList[i].id === "MSRA"
+        eventList[i].id != "MSMF" &&
+        eventList[i].id != "MSRA" &&
+        eventList[i].id != "ARTS"
       ) {
         camTeacherCount += teacherCount;
         camStudentCount += studentCount;
+        camTACount += aidCount;
+        camISCount += isCount;
       }
     }
 
+    let camRatio = parseFloat(
+      (camStudentCount - camISCount) / (camTeacherCount - camISCount)
+    ).toFixed(2);
     console.log(
-      "FINE,DACD,MUSC,MSRA and FITV have " +
+      "\n            \tCAM\t" +
         camTeacherCount +
-        " total instructors teaching " +
+        "\t" +
         camStudentCount +
-        " students. That combined overall ratio is " +
-        parseFloat(camStudentCount / camTeacherCount).toFixed(2) +
-        " students per instructor."
+        "\t" +
+        camRatio +
+        "\t" +
+        camTACount +
+        "\t" +
+        camISCount +
+        "\n\n"
     );
-    let today = new Date();
+    //let today = new Date();
     //console.log(today);
   };
 }
