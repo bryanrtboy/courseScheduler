@@ -107,11 +107,17 @@ function rawEventsToDotSyntax(courses) {
     //Start checking for Room conflicts
     let room_conflict = false;
     let has_other_teacher = false;
+    // let debug =
+    //   course["CATALOG_NUMBER"].substring(1) +
+    //   "." +
+    //   course["CLASS_SECTION_CODE"].toString() +
+    //   " : " +
+    //   last;
 
     if (!allDay && startTime) {
       if (
-        course["INSTRUCTOR_ROLE_CODE"] === "TA" ||
-        course["INSTRUCTOR_ROLE_CODE"] === "SI"
+        course["INSTRUCTOR_ROLE_CODE"] == "TA" ||
+        course["INSTRUCTOR_ROLE_CODE"] == "SI"
       ) {
         has_other_teacher = true;
       }
@@ -128,19 +134,21 @@ function rawEventsToDotSyntax(courses) {
         course["SCHEDULE_PRINT"] +
         has_other_teacher;
 
-      if (!dupeCheck.includes(d)) {
+      if (!dupeCheck.includes(d) && course["CATALOG_NUMBER"].charAt(0) != "5") {
         dupeCheck.push(d);
       } else {
+        //console.log(debug + " is NOT a unique class: " + d);
         if (
           course["BUILDING_ID"] === "D_ZOOM" ||
           course["BUILDING_ID"] === "HYBRID" ||
           course["BUILDING_ID"] === "D_REMOTE" ||
           course["SUBJECT_CODE"] === "PMUS" ||
-          course["COMBINED_SECTION"] === "C" ||
-          course["ACADEMIC_CAREER_CODE"] === "GRAD"
+          course["INSTRUCTOR_ROLE_CODE"] === "TA" ||
+          course["CATALOG_NUMBER"].charAt(0) === "5"
         ) {
           room_conflict = false;
         } else {
+          //console.log("Conflict found for " + debug);
           room_conflict = true;
         }
       }

@@ -52,6 +52,8 @@ class CourseDetail extends React.Component {
             this.props.currentEvent.extendedProps.class_number +
             ", Term: " +
             this.props.currentEvent.extendedProps.term_code +
+            " " +
+            this.props.currentEvent.extendedProps.academic_career_code +
             ". "}
         </p>
         <p className="fine-print">

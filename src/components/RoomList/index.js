@@ -159,6 +159,9 @@ class RoomList extends React.Component {
                     <td className="main">
                       <strong onClick={this.handleChange(event)}>
                         {event.extendedProps.subject_code + " " + event.title}
+                        {event.extendedProps.combined_section === "C"
+                          ? " (" + event.extendedProps.combined_section + ")"
+                          : ""}
                       </strong>
                       <p>
                         {event.extendedProps.last_name}{" "}
