@@ -1,9 +1,13 @@
 export const getEventSources = (data, eventToggles) => {
   let temp = rawEventsToDotSyntax(data);
+  let checked = checkForOverlappingEvents(temp);
   let courses = parseEventsToSubjectCodes(
-    removeEmptyPastClasses(temp),
+    removeEmptyPastClasses(checked),
     eventToggles
   );
+
+  //console.log(checked);
+
   return courses;
 };
 export const colorBySubject = (area, saturation, lightness) => {
@@ -58,7 +62,7 @@ export const displayTime = (start, end, allday) => {
 };
 
 function rawEventsToDotSyntax(courses) {
-  let dupeCheck = [];
+  //let dupeCheck = [];
   let key = 0;
   return courses.map(course => {
     let longtitle =
@@ -71,105 +75,37 @@ function rawEventsToDotSyntax(courses) {
     let allDay = false;
     let tempStart = course["MEETING_TIME_START"];
     let tempEnd = course["MEETING_TIME_END"];
-    if (tempStart === tempEnd) {
-      tempStart = null;
+    if (tempStart == tempEnd) {
+      tempStart = null; //This needs to be null to display across seeral days in Calendar view
       tempEnd = null;
       allDay = true;
+      //console.log(course);
+      //console.log(tempEnd);
     }
-    const startTime = tempStart;
-    const endTime = tempEnd;
-    const startDate = course["CLASS_START_DATE"];
-    const endDate = course["CLASS_END_DATE"];
-    const startRecur = new Date(startDate);
-    const endRecur = new Date(endDate);
-    //let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"].toString();
-    let resourceId = course["BUILDING_ID"] + course["ROOM_NUMBER"];
-    const daysOfWeek = getDaysOfWeek(course["STANDARD_MEETING_PATTERN"]);
-    //const name = course["INSTRUCTOR_NAME"].split(",");
-    let name = course["INSTRUCTOR_NAME"];
-    if (name === null || name.length < 1) {
-      name = "-";
-    }
-    let last = course["INSTRUCTOR_LAST_NAME"];
-    if (last === null || last.length < 1) {
-      last = "-";
-    }
+
+    const daysOfWeek = getDaysOfWeek(
+      course["STANDARD_MEETING_PATTERN"] ?? "ASYNC"
+    );
+
     if (course["SCHEDULE_PRINT"] !== "Y") {
       longtitle += " (H)";
-    }
-    const updatedAt = new Date(course["LAST_DATA_UPDATED_DATE"]);
-
-    let buildId = course["BUILDING_ID"];
-    if (buildId === null) {
-      buildId = "D_NONE";
-    }
-
-    //Start checking for Room conflicts
-    let room_conflict = false;
-    let has_other_teacher = false;
-    // let debug =
-    //   course["CATALOG_NUMBER"].substring(1) +
-    //   "." +
-    //   course["CLASS_SECTION_CODE"].toString() +
-    //   " : " +
-    //   last;
-
-    if (!allDay && startTime) {
-      if (
-        course["INSTRUCTOR_ROLE_CODE"] == "TA" ||
-        course["INSTRUCTOR_ROLE_CODE"] == "SI"
-      ) {
-        has_other_teacher = true;
-      }
-      //This can be improved to convert to a class d and instructor email,
-      //that way a dupe is not a dupe if emails are the same for both classes
-      //This is used to flag classes that are scheduled on top of each other,
-      //while ignoring TA's and SI instructors.
-      let d =
-        startTime +
-        resourceId +
-        course["STANDARD_MEETING_PATTERN"] +
-        startRecur.getMonth() +
-        startRecur.getFullYear() +
-        course["SCHEDULE_PRINT"] +
-        has_other_teacher;
-
-      if (!dupeCheck.includes(d) && course["CATALOG_NUMBER"].charAt(0) != "5") {
-        dupeCheck.push(d);
-      } else {
-        //console.log(debug + " is NOT a unique class: " + d);
-        if (
-          course["BUILDING_ID"] === "D_ZOOM" ||
-          course["BUILDING_ID"] === "HYBRID" ||
-          course["BUILDING_ID"] === "D_REMOTE" ||
-          course["SUBJECT_CODE"] === "PMUS" ||
-          course["INSTRUCTOR_ROLE_CODE"] === "TA" ||
-          course["CATALOG_NUMBER"].charAt(0) === "5"
-        ) {
-          room_conflict = false;
-        } else {
-          //console.log("Conflict found for " + debug);
-          room_conflict = true;
-        }
-      }
-
-      //  console.log("Dupecheck is " + dupeCheck.length);
     }
 
     let color = colorBySubject(course["SUBJECT_CODE"], "36%", "54%");
     if (course["SCHEDULE_PRINT"] !== "Y") {
       color = colorBySubject(course["SUBJECT_CODE"], "26%", "84%");
     }
-
     key++;
     return {
       id: course["SUBJECT_CODE"],
       title: longtitle,
-      startTime,
-      endTime,
-      startRecur,
-      endRecur,
-      resourceId,
+      startTime: tempStart,
+      endTime: tempEnd,
+      startRecur: new Date(course["CLASS_START_DATE"]),
+      endRecur: new Date(course["CLASS_END_DATE"]),
+      resourceId:
+        (course["BUILDING_ID"] ?? "Z_NONE") +
+        (course["ROOM_NUMBER"] ?? "ONLINE"),
       daysOfWeek,
       allDay,
       color,
@@ -179,22 +115,22 @@ function rawEventsToDotSyntax(courses) {
         subject_code: course["SUBJECT_CODE"],
         subject: course["SUBJECT"],
         class_section_code: course["CLASS_SECTION_CODE"].toString(),
-        standard_meeting_pattern: course["STANDARD_MEETING_PATTERN"],
+        standard_meeting_pattern: course["STANDARD_MEETING_PATTERN"] ?? "ASYNC",
         meeting_time_start: course["MEETING_TIME_START"],
         meeting_time_end: course["MEETING_TIME_END"],
         class_start_date: course["CLASS_START_DATE"],
-        building_id: buildId,
-        room_number: course["ROOM_NUMBER"],
+        building_id: course["BUILDING_ID"] ?? "Z_NONE",
+        room_number: course["ROOM_NUMBER"] ?? "ONLINE",
         course_id: course["COURSE_ID"],
         academic_career_code: course["ACADEMIC_CAREER_CODE"],
         academic_organization_code: course["ACADEMIC_ORGANIZATION_CODE"],
-        instructor_name: course["INSTRUCTOR_NAME"],
-        instructor_email: course["INSTRUCTOR_EMAIL"],
-        last_name: last,
-        instructor_role_code: course["INSTRUCTOR_ROLE_CODE"],
-        instructor_mode_code: course["INSTRUCTOR_MODE_CODE"],
+        instructor_name: course["INSTRUCTOR_NAME"] ?? "-",
+        instructor_email: course["INSTRUCTOR_EMAIL"] ?? "-",
+        last_name: course["INSTRUCTOR_LAST_NAME"] ?? "-",
+        instructor_role_code: course["INSTRUCTOR_ROLE_CODE"] ?? "-",
+        instructor_mode_code: course["INSTRUCTOR_MODE_CODE"] ?? "-",
         instructor_load_factor: course["INSTRUCTOR_LOAD_FACTOR"],
-        instructor_empl_id: course["INSTRUCTOR_EMPL_ID"],
+        instructor_empl_id: course["INSTRUCTOR_EMPL_ID"] ?? key.toString(),
         grade_restriction_access: course["GRADE_RESTRICTION_ACCESS"],
         instructor_assignment_number: course["INSTRUCTOR_ASSIGNMENT_NUMBER"],
         room_cap_request: course["ROOM_CAP_REQUEST"],
@@ -202,7 +138,7 @@ function rawEventsToDotSyntax(courses) {
         student_special_perm: course["STUDENT_SPEC_PERM"],
         campus_code: course["CAMPUS_CODE"],
         term_code: course["TERM_CODE"],
-        combined_section: course["COMBINED_SECTION"],
+        combined_section: course["COMBINED_SECTION"] ?? "N",
         section_combined_description: course["SECTION_COMBINED_DESCRIPTION"],
         section_combined_code: course["SECTION_COMBINED_CODE"],
         course_topic: course["COURSE_TOPIC"],
@@ -214,9 +150,9 @@ function rawEventsToDotSyntax(courses) {
         wait_total: course["WAIT_TOTAL"],
         wait_cap: course["WAIT_CAP"],
         color: color,
-        last_data_updated_date: updatedAt,
+        last_data_updated_date: new Date(course["LAST_DATA_UPDATED_DATE"]),
         class_number: course["CLASS_NUMBER"].toString(),
-        room_conflict: room_conflict,
+        room_conflict: false,
         key: key.toString(),
         resourceIds: {
           building: formatBuildingID(course),
@@ -273,13 +209,12 @@ function parseEventsToSubjectCodes(courses, eventToggles) {
 }
 function formatBuildingID(course) {
   //console.log("Building is" + course["BUILDING_ID"]);
-  let buildId = course["BUILDING_ID"];
-  if (buildId === null) {
-    buildId = "D_NULL";
-  }
-  const id = buildId + course["ROOM_NUMBER"];
+  const buildId = course["BUILDING_ID"] ?? "Z_NONE";
+  const id = buildId + (course["ROOM_NUMBER"] ?? "ONLINE");
   const title =
-    buildId.substring(buildId.length - 4) + " " + course["ROOM_NUMBER"];
+    buildId.substring(buildId.length - 4) +
+    " " +
+    (course["ROOM_NUMBER"] ?? "ONLINE");
   const resource = buildId.substring(buildId.length - 4);
   return {
     id,
@@ -300,10 +235,10 @@ function formatCourseID(course) {
   };
 }
 function formatInstructorID(course) {
-  const id = course["INSTRUCTOR_EMPL_ID"];
-  const title = course["INSTRUCTOR_NAME"];
+  const id = course["INSTRUCTOR_EMPL_ID"] ?? "0000";
+  const title = course["INSTRUCTOR_NAME"] ?? "-";
 
-  const resource = course["INSTRUCTOR_LAST_NAME"];
+  const resource = course["INSTRUCTOR_LAST_NAME"] ?? "-";
   return {
     id,
     title,
@@ -328,23 +263,7 @@ function removeEmptyPastClasses(events) {
   //console.log("Started with " + events.length + ", returned " + temp.length);
   return temp;
 }
-// function getUniqueEvents(events) {
-//   let areas = [];
-//   for (let i = 0; i < events.length; i++) {
-//     let eventIds = [];
-//     let uniqueEvents = [];
-//     for (let j = 0; j < events[i].events.length; j++) {
-//       if (!eventIds.includes(events[i].events[j].extendedProps.key)) {
-//         eventIds.push(events[i].events[j].extendedProps.key);
-//         uniqueEvents.push(events[i].events[j]);
-//       }
-//     }
-//     areas.push({ id: events[i].id, events: uniqueEvents });
-//   }
-//
-//   //console.log(temp);
-//   return areas;
-// }
+
 function getDaysOfWeek(meetingPattern) {
   let dow = [1];
   switch (meetingPattern) {
@@ -375,4 +294,53 @@ function getDaysOfWeek(meetingPattern) {
     default:
   }
   return dow;
+}
+
+function checkForOverlappingEvents(events) {
+  const targetEvents = events.sort((a, b) =>
+    a.resourceId.localeCompare(b.resourceId)
+  );
+
+  //  const targetEvents = events;
+  for (let i = 0; i < targetEvents.length; i++) {
+    const startMoment = new Date(
+      Date.parse("1970/01/01 " + targetEvents[i].startTime)
+    );
+    const endMoment = new Date(
+      Date.parse("1970/01/01 " + targetEvents[i].endTime)
+    );
+    const classId = parseInt(targetEvents[i].extendedProps.class_number);
+    const subject = targetEvents[i].extendedProps.subject_code;
+    const resource = targetEvents[i].resourceId;
+    const meeting = targetEvents[i].extendedProps.standard_meeting_pattern;
+    const combined = targetEvents[i].extendedProps.combined_section;
+    const instructor = targetEvents[i].extendedProps.instructor_empl_id;
+
+    for (let j = 0; j < targetEvents.length; j++) {
+      let courseInt = parseInt(targetEvents[j].extendedProps.class_number);
+      let paddedEndTime = new Date(
+        Date.parse("1970/01/01 " + targetEvents[j].endTime)
+      );
+      if (
+        !targetEvents[j].allDay &&
+        instructor != targetEvents[j].extendedProps.instructor_empl_id &&
+        targetEvents[j].extendedProps.schedule_print == "Y" &&
+        targetEvents[i].extendedProps.schedule_print == "Y" &&
+        meeting == targetEvents[j].extendedProps.standard_meeting_pattern &&
+        resource == targetEvents[j].resourceId &&
+        classId != courseInt &&
+        targetEvents[j].extendedProps.subject_code != "PMUS" &&
+        !targetEvents[j].extendedProps.room_conflict &&
+        targetEvents[j].resourceId != "D_ZOOMZOOM" &&
+        targetEvents[j].resourceId != "D_ONLNONLINE" &&
+        targetEvents[j].resourceId != "Z_NONEONLINE" &&
+        startMoment >= Date.parse("1970/01/01 " + targetEvents[j].startTime) &&
+        endMoment <= paddedEndTime.setMinutes(paddedEndTime.getMinutes() + 46)
+      ) {
+        targetEvents[j].extendedProps.room_conflict = true;
+      }
+    }
+  }
+  return targetEvents;
+  //console.log(targetEvents);
 }

@@ -4,8 +4,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-//import momentTimezonePlugin from "@fullcalendar/moment-timezone";
-
 import { colorBySubject } from "../FormattingUtilities.js";
 
 class Calendar extends React.Component {
@@ -85,7 +83,7 @@ class Calendar extends React.Component {
           initialDate={this.props.state.currentCalendarDate}
           allDaySlot={false}
           defaultAllDayEventDuration={{
-            days: 7
+            days: 5
           }}
           slotMinTime="08:00:00"
           slotMaxTime="21:30:00"
