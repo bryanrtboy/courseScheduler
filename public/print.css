@@ -1,0 +1,89 @@
+/*Print stylesheet  based on:
+/* v2.0 | 20110126
+http://meyerweb.com/eric/tools/css/reset/
+License: none (public domain)
+*/
+@media print {
+#header, #footer, #masthead, #wpadminbar, .dontprint, #page ul.main-navigation, #page ul.child-nav , #tertiary, .gallery, #colorbox, #cboxOverlay, #cboxWrapper {
+	display: none;
+	visibility: none;
+
+
+body, html {
+	width: 100%;
+	/*font-size: 50%;*/
+	font-size: 9px;
+}
+
+.hidden {
+	display:block;
+}
+
+td, tr {
+	margin: 0;
+	padding: 0 0 .2em 0;
+	overflow: visible;
+}
+
+tr {
+	page-break-before: always;
+}
+table {
+	border: none;
+}
+* {
+	background: transparent !important;
+	color: black !important;
+	text-shadow: none !important;
+	filter: none !important;
+	-ms-filter: none !important;
+}
+
+a, a:visited {
+	text-decoration: none;
+}
+
+/*Show the URL's when Printing*/
+/*
+a[href]:after {
+	content: " (" attr(href) ")";
+}
+abbr[title]:after {
+	content: " (" attr(title) ")";
+}
+.ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+	content: "";
+}
+*/
+
+pre, blockquote {
+	border: 1px solid #999;
+	page-break-inside: avoid;
+}
+thead {
+	display: table-header-group;
+}
+/* h5bp.com/t */
+tr, img, th {
+	page-break-inside: never;
+}
+img {
+	max-width: 100% !important;
+}
+p, h2, h3 {
+	orphans: 3;
+	widows: 3;
+}
+h2, h3 {
+	page-break-after: avoid;
+}
+th, tr {
+	page-break-after: avoid;
+}
+
+.page .hentry p, .page .hentry h2, .page .hentry h3, .page .hentry h4, .page .hentry h5, .page .entry-content ul, .code, .page-id-3864 .hentry div.gallery, .page-id-2146 .hentry div.gallery, div.entry-content div.wp-caption, .entry-content {
+	width: 100%;
+	clear: both;
+}
+}
+

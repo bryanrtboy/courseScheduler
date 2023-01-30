@@ -1,5 +1,9 @@
 [
   {
+    "id": "amanda.barrell@ucdenver.edu",
+    "name": "Amanda Barrell"
+  },
+  {
     "id": "christopher.beeson@ucdenver.edu",
     "name": "Christopher Beeson"
   },
@@ -8,35 +12,23 @@
     "name": "Michelle Carpenter"
   },
   {
-    "id": "christie.chambers@ucdenver.edu",
-    "name": "Christie Chambers"
+    "id": "claire.gervais@ucdenver.edu",
+    "name": "Claire Gervais"
   },
   {
     "id": "leah.haloin@ucdenver.edu",
     "name": "Leah Haloin"
   },
   {
-    "id": "karin.hunter@ucdenver.edu",
-    "name": "Karin Hunter"
-  },
-  {
     "id": "sean.koto@ucdenver.edu",
     "name": "Sean Koto"
   },
   {
-    "id": "bryan.leister@ucdenver.edu",
-    "name": "Bryan Leister"
+    "id": "sean.mcgowan@ucdenver.edu",
+    "name": "Sean McGowan"
   },
   {
     "id": "david.liban@ucdenver.edu",
     "name": "David Liban"
-  },
-  {
-    "id": "jessica.mcgaugh@ucdenver.edu",
-    "name": "Jessica McGaugh"
-  },
-  {
-    "id": "richard.strasser@ucdenver.edu",
-    "name": "Richard Strasser"
   }
 ]

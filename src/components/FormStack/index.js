@@ -17,7 +17,10 @@ class FSButton extends React.Component {
     this.changeFrom = this.changeFrom.bind(this);
     this.onCheckboxChange = this.onCheckboxChange.bind(this);
     this.state = {
-      approver: { name: "Karin Hunter", email: "karin.hunter@ucdenver.edu" },
+      approver: {
+        name: "Amanda Barrell",
+        email: "amanda.barrell@ucdenver.edu"
+      },
       from: { name: "", email: "" },
       add: false,
       isFutureCourse: true,
