@@ -1,7 +1,6 @@
 import React from "react";
 import CourseTitle from "../CourseTitle/";
 import { displayTime } from "../FormattingUtilities.js";
-import InstagramEmbed from "react-instagram-embed";
 
 import "./coursedetail.css";
 import courseDescriptions from "../../data/camuniqueinventory.json";
@@ -23,25 +22,6 @@ class CourseDetail extends React.Component {
         ". Effective " +
         d.EFFECTIVE_DATE.slice(0, -5)
       : "No Description Available.";
-
-    const promotion =
-      d && d.URL !== "" ? (
-        <InstagramEmbed
-          className="promote"
-          url="https://www.instagram.com/p/CAGTsMBFQYV/"
-          maxWidth={320}
-          hideCaption={true}
-          containerTagName="div"
-          protocol=""
-          injectScript
-          onLoading={() => {}}
-          onSuccess={() => {}}
-          onAfterRender={() => {}}
-          onFailure={() => {}}
-        />
-      ) : (
-        ""
-      );
 
     const finePrint = this.props.showFinePrint ? (
       <div>
@@ -66,7 +46,6 @@ class CourseDetail extends React.Component {
 
     return (
       <div>
-        {promotion}
         <CourseTitle
           title={
             this.props.currentEvent.extendedProps.subject_code +
